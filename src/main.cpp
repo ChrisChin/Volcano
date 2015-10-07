@@ -8,7 +8,6 @@
 #include "imageLoader.hpp"
 #include "shaderLoader.hpp"
 
-
 #include "volcano.hpp"
 #include "city.hpp"
 #include "lava.hpp"
@@ -30,6 +29,11 @@ float g_fovy = 20.0;
 float g_znear = 0.1;
 float g_zfar = 1000.0;
 
+bool g_mouseDown = false;
+vec2 g_mousePos;
+float g_yRotation = 0;
+float g_xRotation = 0;
+float g_zoomFactor = 1.0;
 
 // Geometry loader and drawer
 //
@@ -48,14 +52,10 @@ void initLight() {
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffintensity);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
 
-
 	glEnable(GL_LIGHT0);
 }
 
 
-// Sets up where the camera is in the scene
-// Called every frame
-// 
 void setUpCamera() {
 	// Set up the projection matrix
 	glMatrixMode(GL_PROJECTION);
@@ -65,12 +65,10 @@ void setUpCamera() {
 	// Set up the view part of the model view matrix
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	gluLookAt(0.0, 0.0, 50.0, // position of camera
-		0.0, 0.0, 0.0, // position to look at
-		0.0, 1.0, 0.0);// up relative to camera
 
-	// YOUR CODE GOES HERE
-	// ...
+	glTranslatef(0, 0, -50 * g_zoomFactor);
+	glRotatef(g_xRotation, 1, 0, 0);
+	glRotatef(g_yRotation, 0, 1, 0);
 }
 
 
@@ -91,14 +89,12 @@ void draw() {
 	glEnable(GL_NORMALIZE);
 	glEnable(GL_COLOR_MATERIAL);
 
-
 	// Set the current material (for all objects) to red
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	glColor3f(1.0f, 0.0f, 0.0f);
 
 	// Render geometry
 	g_geometry->renderGeometry();
-
 
 	// Disable flags for cleanup (optional)
 	glDisable(GL_DEPTH_TEST);
@@ -126,24 +122,6 @@ void reshape(int w, int h) {
 	glViewport(0, 0, g_winWidth, g_winHeight);
 }
 
-
-//-------------------------------------------------------------
-// [Assignment 1] :
-// The following callback functions are used for processing
-// user input. Modify in EITHER of the following ways.
-//
-// Modify keyboardCallback so that when the 'r' key is pressed
-// rotate the camera around the model horizontally.
-//
-// or
-//
-// Modify the mouseCallback and mouseMotionCallback functions
-// so when the left mouse button is pressed and dragged along
-// the screen horizontally, the camera also roates around the
-// model horizontally.
-//-------------------------------------------------------------
-
-
 // Keyboard callback
 // Called once per button state change
 //
@@ -162,22 +140,25 @@ void specialCallback(int key, int x, int y) {
 }
 
 
-//-------------------------------------------------------------
-// [Assignment 1] :
-// Modify the mouseCallback function in main.cpp so that when
-// the right mouse button is clicked, the wireframe mode on
-// Geometry is toggled on and off.
-//-------------------------------------------------------------
-
-// Mouse Button Callback function
-// Called once per button state change
-// 
 void mouseCallback(int button, int state, int x, int y) {
 	cout << "Mouse Callback :: button=" << button << ", state=" << state << ", x,y=(" << x << "," << y << ")" << endl;
-	if (button == 2)
-		g_geometry->toggleWireFrame();
-}
+	// YOUR CODE GOES HERE
+	// ...
+	switch (button){
 
+	case 0: // left mouse button
+		g_mouseDown = (state == 0);
+		g_mousePos = vec2(x, y);
+		break;
+	case 3: // scroll foward/up
+		g_zoomFactor /= 1.1;
+		break;
+
+	case 4: // scroll back/down
+		g_zoomFactor *= 1.1;
+		break;
+	}
+}
 
 // Mouse Motion Callback function
 // Called once per frame if the mouse has moved and
@@ -187,19 +168,17 @@ void mouseMotionCallback(int x, int y) {
 	cout << "Mouse Motion Callback :: x,y=(" << x << "," << y << ")" << endl;
 	// YOUR CODE GOES HERE
 	// ...
+	if (g_mouseDown) {
+		vec2 dif = vec2(x, y) - g_mousePos;
+		g_mousePos = vec2(x, y);
+		g_yRotation += 0.3 * dif.x;
+		g_xRotation += 0.3 * dif.y;
+	}
 }
-
-
 
 //Main program
 // 
 int main(int argc, char **argv) {
-
-	if (argc != 2){
-		cout << "Obj filename expected, eg:" << endl << "    ./a1 teapot.obj" << endl;
-		exit(EXIT_FAILURE);
-	}
-
 	// Initialise GL, GLU and GLUT
 	glutInit(&argc, argv);
 
@@ -224,9 +203,7 @@ int main(int argc, char **argv) {
 
 	cout << "Using OpenGL " << glGetString(GL_VERSION) << endl;
 	cout << "Using GLEW " << glewGetString(GLEW_VERSION) << endl;
-
-
-
+	
 	// Register functions for callback
 	glutDisplayFunc(draw);
 	glutReshapeFunc(reshape);
@@ -236,14 +213,12 @@ int main(int argc, char **argv) {
 
 	glutMouseFunc(mouseCallback);
 	glutMotionFunc(mouseMotionCallback);
-
-
-
+	
 	// Create a light on the camera
 	initLight();
 
 	// Finally create our geometry
-	g_geometry = new Geometry(argv[1]);
+	g_geometry = new Geometry("Volcano/res/assets/volcano.obj");
 
 	// Loop required by GLUT
 	// This will not return until we tell GLUT to finish
