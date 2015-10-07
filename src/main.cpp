@@ -5,37 +5,251 @@
 
 #include "comp308.hpp"
 
+#include "imageLoader.hpp"
+#include "shaderLoader.hpp"
+
+
+#include "volcano.hpp"
+#include "city.hpp"
+#include "lava.hpp"
+#include "weather.hpp"
+
 using namespace std;
 using namespace comp308;
 
-void display() {
+// Global variables
+// 
+GLuint g_winWidth = 640;
+GLuint g_winHeight = 480;
+GLuint g_mainWindow = 0;
 
-	/* clear window */
-	glClear(GL_COLOR_BUFFER_BIT);
 
-	/* draw scene */
-	glutSolidTeapot(.5);
+// Projection values
+// 
+float g_fovy = 20.0;
+float g_znear = 0.1;
+float g_zfar = 1000.0;
 
-	/* flush drawing routines to the window */
-	glFlush();
 
+// Geometry loader and drawer
+//
+Geometry *g_geometry = nullptr;
+
+
+// Sets up where and what the light is
+// Called once on start up
+// 
+void initLight() {
+	float direction[] = { 0.0f, 0.0f, 1.0f, 0.0f };
+	float diffintensity[] = { 0.7f, 0.7f, 0.7f, 1.0f };
+	float ambient[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+
+	glLightfv(GL_LIGHT0, GL_POSITION, direction);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffintensity);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+
+
+	glEnable(GL_LIGHT0);
 }
 
-int main(int argc, char * argv[]) {
 
-	/* initialize GLUT, using any commandline parameters passed to the
-	program */
+// Sets up where the camera is in the scene
+// Called every frame
+// 
+void setUpCamera() {
+	// Set up the projection matrix
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(g_fovy, float(g_winWidth) / float(g_winHeight), g_znear, g_zfar);
+
+	// Set up the view part of the model view matrix
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	gluLookAt(0.0, 0.0, 50.0, // position of camera
+		0.0, 0.0, 0.0, // position to look at
+		0.0, 1.0, 0.0);// up relative to camera
+
+	// YOUR CODE GOES HERE
+	// ...
+}
+
+
+// Draw function
+//
+void draw() {
+
+	// Set up camera every frame
+	setUpCamera();
+
+	// Black background
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Enable flags for normal rendering
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_NORMALIZE);
+	glEnable(GL_COLOR_MATERIAL);
+
+
+	// Set the current material (for all objects) to red
+	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+	glColor3f(1.0f, 0.0f, 0.0f);
+
+	// Render geometry
+	g_geometry->renderGeometry();
+
+
+	// Disable flags for cleanup (optional)
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_LIGHTING);
+	glDisable(GL_NORMALIZE);
+	glDisable(GL_COLOR_MATERIAL);
+
+	// Move the buffer we just drew to the front
+	glutSwapBuffers();
+
+	// Queue the next frame to be drawn straight away
+	glutPostRedisplay();
+}
+
+
+// Reshape function
+// 
+void reshape(int w, int h) {
+	if (h == 0) h = 1;
+
+	g_winWidth = w;
+	g_winHeight = h;
+
+	// Sets the openGL rendering window to match the window size
+	glViewport(0, 0, g_winWidth, g_winHeight);
+}
+
+
+//-------------------------------------------------------------
+// [Assignment 1] :
+// The following callback functions are used for processing
+// user input. Modify in EITHER of the following ways.
+//
+// Modify keyboardCallback so that when the 'r' key is pressed
+// rotate the camera around the model horizontally.
+//
+// or
+//
+// Modify the mouseCallback and mouseMotionCallback functions
+// so when the left mouse button is pressed and dragged along
+// the screen horizontally, the camera also roates around the
+// model horizontally.
+//-------------------------------------------------------------
+
+
+// Keyboard callback
+// Called once per button state change
+//
+void keyboardCallback(unsigned char key, int x, int y) {
+	cout << "Keyboard Callback :: key=" << key << ", x,y=(" << x << "," << y << ")" << endl;
+	// YOUR CODE GOES HERE
+}
+
+
+// Special Keyboard callback
+// Called once per button state change
+//
+void specialCallback(int key, int x, int y) {
+	cout << "Special Callback :: key=" << key << ", x,y=(" << x << "," << y << ")" << endl;
+	// Not needed for this assignment, but useful to have later on
+}
+
+
+//-------------------------------------------------------------
+// [Assignment 1] :
+// Modify the mouseCallback function in main.cpp so that when
+// the right mouse button is clicked, the wireframe mode on
+// Geometry is toggled on and off.
+//-------------------------------------------------------------
+
+// Mouse Button Callback function
+// Called once per button state change
+// 
+void mouseCallback(int button, int state, int x, int y) {
+	cout << "Mouse Callback :: button=" << button << ", state=" << state << ", x,y=(" << x << "," << y << ")" << endl;
+	if (button == 2)
+		g_geometry->toggleWireFrame();
+}
+
+
+// Mouse Motion Callback function
+// Called once per frame if the mouse has moved and
+// at least one mouse button has an active state
+// 
+void mouseMotionCallback(int x, int y) {
+	cout << "Mouse Motion Callback :: x,y=(" << x << "," << y << ")" << endl;
+	// YOUR CODE GOES HERE
+	// ...
+}
+
+
+
+//Main program
+// 
+int main(int argc, char **argv) {
+
+	if (argc != 2){
+		cout << "Obj filename expected, eg:" << endl << "    ./a1 teapot.obj" << endl;
+		exit(EXIT_FAILURE);
+	}
+
+	// Initialise GL, GLU and GLUT
 	glutInit(&argc, argv);
 
-	/* setup the size, position, and display mode for new windows */
-	glutInitWindowSize(500, 500);
-	glutInitWindowPosition(0, 0);
-	glutInitDisplayMode(GLUT_RGB);
+	// Setting up the display
+	// - RGB color model + Alpha Channel = GLUT_RGBA
+	// - Double buffered = GLUT_DOUBLE
+	// - Depth buffer = GLUT_DEPTH
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 
-	/* create and set up a window */
-	glutCreateWindow("hello, teapot!");
-	glutDisplayFunc(display);
+	// Initialise window size and create window
+	glutInitWindowSize(g_winWidth, g_winHeight);
+	g_mainWindow = glutCreateWindow("COMP308 Assignment 1");
 
-	/* tell GLUT to wait for events */
+
+	// Initilise GLEW
+	// must be done after creating GL context (glutCreateWindow in this case)
+	GLenum err = glewInit();
+	if (GLEW_OK != err) { // Problem: glewInit failed, something is seriously wrong.
+		cerr << "Error: " << glewGetErrorString(err) << endl;
+		abort(); // Unrecoverable error
+	}
+
+	cout << "Using OpenGL " << glGetString(GL_VERSION) << endl;
+	cout << "Using GLEW " << glewGetString(GLEW_VERSION) << endl;
+
+
+
+	// Register functions for callback
+	glutDisplayFunc(draw);
+	glutReshapeFunc(reshape);
+
+	glutKeyboardFunc(keyboardCallback);
+	glutSpecialFunc(specialCallback);
+
+	glutMouseFunc(mouseCallback);
+	glutMotionFunc(mouseMotionCallback);
+
+
+
+	// Create a light on the camera
+	initLight();
+
+	// Finally create our geometry
+	g_geometry = new Geometry(argv[1]);
+
+	// Loop required by GLUT
+	// This will not return until we tell GLUT to finish
 	glutMainLoop();
+
+	// Don't forget to delete all pointers that we made
+	delete g_geometry;
+	return 0;
 }
