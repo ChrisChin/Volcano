@@ -8,21 +8,12 @@ SET(headers
 	"comp308.hpp"
 	"imageLoader.hpp"
 	"shaderLoader.hpp"
-	"volcano.hpp"
-	"lava.hpp"
-	"city.hpp"
-	"weather.hpp"
 )
 
 
 # TODO list your source files (.cpp) here
 SET(sources
 	"main.cpp"
-	"volcano.cpp"
-	"lava.cpp"
-	"city.cpp"
-	"weather.cpp"
-
 )
 
 # Add executable target and link libraries

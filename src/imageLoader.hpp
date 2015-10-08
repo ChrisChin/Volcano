@@ -38,8 +38,8 @@ struct image {
 
 	image(const image &) = default;
 	image & operator=(const image &) = default;
-	//image(image &&) = default;
-	//image & operator=(image &&) = default;
+	image(image &&) = default;
+	image & operator=(image &&) = default;
 
 
 	// Use to get the appropriate GL format for data
@@ -49,7 +49,7 @@ struct image {
 		case 2: return GL_RG;
 		case 3: return GL_RGB;
 		case 4: return GL_RGBA;
-		default: return GL_RGB; // TODO list
+		default: return GL_RGBA; // TODO list
 		}
 	}
 
