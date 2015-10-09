@@ -38,7 +38,7 @@ float g_zoomFactor = 1.0;
 // Geometry loader and drawer
 //
 Geometry *g_geometry = nullptr;
-
+Weather *g_weather = nullptr;
 
 // Sets up where and what the light is
 // Called once on start up
@@ -95,6 +95,7 @@ void draw() {
 
 	// Render geometry
 	g_geometry->renderGeometry();
+	g_weather->renderClouds();
 
 	// Disable flags for cleanup (optional)
 	glDisable(GL_DEPTH_TEST);
@@ -219,6 +220,7 @@ int main(int argc, char **argv) {
 
 	// Finally create our geometry
 	g_geometry = new Geometry("Volcano/res/assets/volcano.obj");
+	g_weather = new Weather();
 
 	// Loop required by GLUT
 	// This will not return until we tell GLUT to finish
@@ -226,5 +228,6 @@ int main(int argc, char **argv) {
 
 	// Don't forget to delete all pointers that we made
 	delete g_geometry;
+	delete g_weather;
 	return 0;
 }
