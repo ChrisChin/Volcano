@@ -33,7 +33,7 @@ bool g_mouseDown = false;
 vec2 g_mousePos;
 float g_yRotation = 0;
 float g_xRotation = 0;
-float g_zoomFactor = 1.0;
+float g_zoomFactor = 10;
 
 // Geometry loader and drawer
 //
@@ -91,8 +91,7 @@ void draw() {
 
 	// Set the current material (for all objects) to red
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-	glColor3f(1.0f, 0.0f, 0.0f);
-
+	
 	// Render geometry
 	g_geometry->renderGeometry();
 
