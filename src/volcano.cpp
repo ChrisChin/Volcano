@@ -21,6 +21,16 @@ Geometry::Geometry(string filename) {
 	if (m_triangles.size() > 0) {
 		createDisplayListPoly();
 	}
+	float min = 10000;
+	float max = 0;
+	for (int i = 0; i < m_points.size(); i++){
+		if (m_points[i].y < min)
+			min = m_points[i].y;
+		if (m_points[i].y > max)
+			max = m_points[i].y;
+	}
+	height = max - min;
+	cout << height << endl;
 }
 
 void Geometry::readOBJ(string filename) {
@@ -159,8 +169,8 @@ void Geometry::createDisplayListPoly() {
 	// Create a new list
 	cout << "Creating Poly Geometry" << endl;
 	m_displayListPoly = glGenLists(1);
-	glNewList(m_displayListPoly, GL_COMPILE);
-
+	glNewList(m_displayListPoly, GL_COMPILE); 
+	glColor3f(0.2, 0.1, 0);
 	glBegin(GL_TRIANGLES);
 	for (unsigned int i = 0; i < m_triangles.size(); i++){
 		for (int j = 0; j<3; j++){
