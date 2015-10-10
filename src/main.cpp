@@ -20,6 +20,20 @@ GLuint shadowMapTexture;
 
 //window size
 int windowWidth, windowHeight;
+// Projection values
+// 
+float g_fovy = 20.0;
+float g_znear = 0.1;
+float g_zfar = 1000.0;
+
+
+// Mouse controlled Camera values
+//
+bool g_mouseDown = false;
+vec2 g_mousePos;
+float g_yRotation = 0;
+float g_xRotation = 0;
+float g_zoomFactor = 1.0;
 
 //Matrices
 mat4 lightProjectionMatrix, lightViewMatrix;
@@ -29,9 +43,20 @@ float white[4] = { 1, 1, 1, 1 };
 float dimwhite[4] = { 0.2, 0.2, 0.2, 0.2 };
 float black[4] = { 0,0,0,0 };
 
+void initLight() {
+	float direction[] = { 0.0f, 0.0f, 1.0f, 0.0f };
+	float diffintensity[] = { 0.7f, 0.7f, 0.7f, 1.0f };
+	float ambient[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+
+	glLightfv(GL_LIGHT0, GL_POSITION, direction);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffintensity);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+
+	glEnable(GL_LIGHT0);
+}
+
 //Called for initiation
-bool Init(void)
-{
+bool Init(void){
 
 	//Load identity modelview
 	glMatrixMode(GL_MODELVIEW);
@@ -95,9 +120,23 @@ bool Init(void)
 	glGetFloatv(GL_MODELVIEW_MATRIX, (GLfloat*)&lightViewMatrix);
 
 	glPopMatrix();
-
-
+	
 	return true;
+}
+void setUpCamera() {
+	// Set up the projection matrix
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(g_fovy, float(windowWidth) / float(windowHeight), g_znear, g_zfar);
+
+	// Set up the view part of the model view matrix
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	// Load camera transforms
+	glTranslatef(0, 0, -5 * g_zoomFactor);
+	glRotatef(g_xRotation, 1, 0, 0);
+	glRotatef(g_yRotation, 0, 1, 0);
 }
 
 void DrawScene(float angle)
@@ -165,13 +204,11 @@ void DrawScene(float angle)
 		}
 		glEndList();
 	}
-
+	glPushMatrix();
 
 	//Draw objects
 	glCallList(baseList);
 	glCallList(torusList);
-
-	glPushMatrix();
 	glRotatef(angle, 0.0f, 1.0f, 0.0f);
 	glCallList(spheresList);
 	glPopMatrix();
@@ -180,10 +217,10 @@ void DrawScene(float angle)
 //Called to draw scene
 void Display(void)
 {
+	setUpCamera();
 	//angle of spheres in scene. Calculate from time
 	float angle = 10;
-
-
+	glPushMatrix();
 
 	//First pass - from light's point of view
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -215,9 +252,6 @@ void Display(void)
 	glCullFace(GL_BACK);
 	glShadeModel(GL_SMOOTH);
 	glColorMask(1, 1, 1, 1);
-
-
-
 
 	//2nd pass - Draw from camera's point of view
 	glClear(GL_DEPTH_BUFFER_BIT);
@@ -327,6 +361,7 @@ void Display(void)
 	glFinish();
 	glutSwapBuffers();
 	glutPostRedisplay();
+	glPopMatrix();
 }
 
 //Called on window resize
@@ -352,6 +387,38 @@ void Keyboard(unsigned char key, int x, int y)
 
 }
 
+void mouseCallback(int button, int state, int x, int y) {
+	//cout << "Mouse Callback :: button=" << button << ", state=" << state << ", (" << x << "," << y << ")" << endl;
+	switch (button){
+	case 0: //left mouse button
+		g_mouseDown = (state == 0);
+		//g_mousePos = vec2(x, y);
+		break;
+
+	case 3: //scroll foward/up
+		g_zoomFactor /= 1.1;
+		break;
+
+	case 4: //scroll back/down
+		g_zoomFactor *= 1.1;
+		break;
+	}
+}
+// Mouse Motion Callback function
+// Called once per frame if the mouse has moved and
+// at least one mouse button has an active state
+// 
+void mouseMotionCallback(int x, int y) {
+	//cout << "Mouse Motion Callback :: (" << x << "," << y << ")" << endl;
+	if (g_mouseDown) {
+		vec2 dif = vec2(x, y) - g_mousePos;
+		//g_mousePos = vec2(x, y);
+		g_yRotation += 0.3 * dif.x;
+		g_xRotation += 0.3 * dif.y;
+	}
+}
+
+
 int main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
@@ -361,10 +428,15 @@ int main(int argc, char** argv)
 
 	if (!Init())
 		return 0;
+	//initLight();
+
 
 	glutDisplayFunc(Display);
 	glutReshapeFunc(Reshape);
 	glutKeyboardFunc(Keyboard);
+
+	glutMouseFunc(mouseCallback);
+	glutMotionFunc(mouseMotionCallback);
 	glutMainLoop();
 	return 0;
 }
