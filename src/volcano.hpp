@@ -32,7 +32,13 @@ private:
 	GLuint m_displayListPoly = 0; // DisplayList for Polygon
 	GLuint m_displayListWire = 0; // DisplayList for Wireframe
 
-	float height;
+	float minHeight;
+	float maxHeight;
+	float minX;
+	float maxX;
+	float minZ;
+	float maxZ;
+	float heightMap[60][60];
 
 	void readOBJ(std::string);
 	void createNormals();

@@ -29,8 +29,55 @@ Geometry::Geometry(string filename) {
 		if (m_points[i].y > max)
 			max = m_points[i].y;
 	}
-	height = max - min;
-	cout << height << endl;
+	maxHeight = max;
+	minHeight = min;
+	
+	cout << "maxheight " << maxHeight << endl;
+	cout << "minHeight " << minHeight << endl;
+
+	float currentminX = 10000;
+	float currentmaxX = 0;
+	for (int i = 0; i < m_points.size(); i++){
+		if (m_points[i].x < currentminX)
+			currentminX = m_points[i].x;
+		if (m_points[i].x > currentmaxX)
+			currentmaxX = m_points[i].x;
+	}
+	maxX = currentmaxX;
+	minX = currentminX;
+
+	cout << "maxX " << maxX << endl;
+	cout << "minX " << minX << endl;
+
+	float currentminZ = 10000;
+	float currentmaxZ = 0;
+	for (int i = 0; i < m_points.size(); i++){
+		if (m_points[i].z < currentminZ)
+			currentminZ = m_points[i].z;
+		if (m_points[i].z > currentmaxZ)
+			currentmaxZ = m_points[i].z;
+	}
+	maxX = currentmaxZ;
+	minX = currentminZ;
+
+	cout << "currentmaxZ " << currentmaxZ << endl;
+	cout << "currentminZ " << currentminZ << endl;
+	for (int i = 0; i < 60; i++){
+		for (int j = 0; j < 60; j++){
+			heightMap[i][j] = 0;
+		}
+	}
+
+	for (int i = 0; i < m_points.size(); i++){
+		heightMap[((int) m_points[i].x) +30][((int) m_points[i].z)+30] = m_points[i].y;
+	}
+
+	//for (int i = 0; i < 60; i++){
+	//	for (int j = 0; j < 60; j++){
+	//		cout << heightMap[i][j]<< endl;
+	//	}
+	//}
+
 }
 
 void Geometry::readOBJ(string filename) {
