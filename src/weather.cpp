@@ -1,4 +1,5 @@
 
+#include <cmath>
 #include <string>
 #include <cstdlib>
 #include <vector>
@@ -6,13 +7,17 @@
 #include "comp308.hpp"
 
 using namespace std;
+using namespace comp308;
 
-int windVelocity = 0;
+double windVelocity = 0.02;
+int windDir = -1;
+
 GLdouble particleRadius = 5;
 int cloudIndex = 0;
 Cloud clouds[10];
 
 Weather::Weather(){
+	initialiseWind();
 	initialiseCloud();
 }
 
@@ -20,29 +25,17 @@ void Weather::initialiseCloud(){
 	Cloud c;
 
 	CloudParticle cp;
-	cp.centreX = 0;
-	cp.centreY = 50;
-	cp.centreZ = 0;
+	cp.particleCentre = vec3(0,50,0);
 	CloudParticle cp2;
-	cp2.centreX = 5;
-	cp2.centreY = 50;
-	cp2.centreZ = 0;
+	cp2.particleCentre = vec3(5,50,0);
 	CloudParticle cp3;
-	cp3.centreX = -5;
-	cp3.centreY = 50;
-	cp3.centreZ = 0;
+	cp3.particleCentre = vec3(-5,50,0);
 	CloudParticle cp4;
-	cp4.centreX = 0;
-	cp4.centreY = 55;
-	cp4.centreZ = 0;
+	cp4.particleCentre = vec3(0,55,0);
 	CloudParticle cp5;
-	cp5.centreX = 5;
-	cp5.centreY = 55;
-	cp5.centreZ = 0;
+	cp5.particleCentre = vec3(5,55,0);
 	CloudParticle cp6;
-	cp6.centreX = 10;
-	cp6.centreY = 50;
-	cp6.centreZ = 0;
+	cp6.particleCentre = vec3(10,50,0);
 
 	c.parts[c.index] = cp;
 	c.parts[c.index+1] = cp2;
@@ -55,31 +48,80 @@ void Weather::initialiseCloud(){
 	cloudIndex++;
 }
 
-void Weather::transitionCloud(Cloud c){
-	cout << "swag" << c.index << endl;
+void Weather::transitionCloud(){
+	for(int i=0; i < cloudIndex; i++){
+		Cloud* c = &clouds[i];
+		for(int j=0; j < c->index; j++){
+			CloudParticle* cp = &c->parts[j];
+			switch(windDir){
+				case 0: //North
+					cp->particleCentre.z -= windVelocity;
+					break;
+				case 1: //North East
+					cp->particleCentre.z -= (windVelocity/2);
+					cp->particleCentre.x += (windVelocity/2);
+					break;
+				case 2: //East
+					cp->particleCentre.x += windVelocity;
+					break;
+				case 3: //South East
+					cp->particleCentre.z += (windVelocity/2);
+					cp->particleCentre.x += (windVelocity/2);
+					break;
+				case 4: //South
+					cp->particleCentre.z += windVelocity;
+					break;
+				case 5: //South West
+					cp->particleCentre.z += (windVelocity/2);
+					cp->particleCentre.x -= (windVelocity/2);
+					break;
+				case 6: //West
+					cp->particleCentre.x -= windVelocity;
+					break;
+				case 7: //North West
+					cp->particleCentre.z -= (windVelocity/2);
+					cp->particleCentre.x -= (windVelocity/2);
+					break;
+			}
+		}	
+	}
 }
 
-void Weather::growCloud(Cloud c){
-	cout << "swag" << c.index << endl;
+void Weather::initialiseWind(){
+	windDir = rand() % 8;
 }
 
+void Weather::growClouds(){
+//Grow from the edges of the cloud
+	for(int i=0; i < cloudIndex; i++){
+		Cloud* c = &clouds[i];
+		for(int j=0; j < c->index; j++){
+
+		}
+	}
+}
+
+//Need to find distance from centre of cloud
+//Higher probability of extinction further away from centre
 void Weather::cloudExtinction(Cloud c){
 	cout << "swag" << c.index << endl;
 }
 
 void Weather::renderClouds(){
+	transitionCloud();
 	for(int i=0; i < cloudIndex; i++){
 		Cloud c = clouds[i];
 		for(int j=0; j < c.index; j++){
-			renderParticles(clouds[i].parts[j]);
+			renderParticles(c.parts[j]);
 		}
 	}
 }
+
 void Weather::renderParticles(CloudParticle p){
-	cout << p.centreX << " " << p.centreY << " " << p.centreZ << endl;
+	//cout << p.centreX << " " << p.centreY << " " << p.centreZ << endl;
 	glColor3f(1.0f,1.0f,1.0f);
 	glPushMatrix();
-	glTranslatef(p.centreX,p.centreY,p.centreZ);
+	glTranslatef(p.particleCentre.x,p.particleCentre.y,p.particleCentre.z);
 	glutSolidSphere(particleRadius,20,20);
 	glPopMatrix();
 }

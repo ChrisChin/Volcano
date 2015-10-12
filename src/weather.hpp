@@ -1,21 +1,24 @@
 #include <vector>
+#include "comp308.hpp"
+
+using namespace comp308;
 
 struct CloudParticle{
-	int centreX = 0;
-	int centreY = 0;
-	int centreZ = 0;
+	vec3 particleCentre = vec3(0,0,0);
 };
 
 struct Cloud{
 	int index = 0;
+	vec3 cloudCentre = vec3(0,0,0);
 	CloudParticle parts[50];
 };
 
 class Weather{
 private:
 	void initialiseCloud();
-	void transitionCloud(Cloud c);
-	void growCloud(Cloud c);
+	void transitionCloud();
+	void initialiseWind();
+	void growClouds();
 	void cloudExtinction(Cloud c);
 	void renderParticles(CloudParticle p);
 public:
