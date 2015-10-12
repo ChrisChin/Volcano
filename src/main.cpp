@@ -27,7 +27,7 @@ GLuint g_mainWindow = 0;
 // 
 float g_fovy = 20.0;
 float g_znear = 0.1;
-float g_zfar = 1000.0;
+float g_zfar = 100000.0;
 
 bool g_mouseDown = false;
 vec2 g_mousePos;
@@ -38,6 +38,9 @@ float g_zoomFactor = 1.0;
 // Geometry loader and drawer
 //
 Geometry *g_geometry = nullptr;
+
+
+City *city = nullptr;
 
 
 // Sets up where and what the light is
@@ -95,6 +98,7 @@ void draw() {
 
 	// Render geometry
 	g_geometry->renderGeometry();
+	city->render();
 
 	// Disable flags for cleanup (optional)
 	glDisable(GL_DEPTH_TEST);
@@ -219,12 +223,14 @@ int main(int argc, char **argv) {
 
 	// Finally create our geometry
 	g_geometry = new Geometry("Volcano/res/assets/volcano.obj");
+	city = new City();
 
 	// Loop required by GLUT
 	// This will not return until we tell GLUT to finish
 	glutMainLoop();
 
 	// Don't forget to delete all pointers that we made
+	delete city;
 	delete g_geometry;
 	return 0;
 }
