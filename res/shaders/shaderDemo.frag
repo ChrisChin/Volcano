@@ -23,7 +23,6 @@ varying vec3 vPosition;
 varying vec2 vTextureCoord0;
 
 void main() {
-	//gl_FragColor = texture2D(texture0, vTextureCoord0);
-
-	gl_FragColor.rgb = vPosition;
+	gl_FragColor = texture2D(texture0, vTextureCoord0);
+	//gl_FragColor.rgb = vPosition;
 }

@@ -23,6 +23,11 @@ float minZ;
 float maxZ;
 float heightMap[60][60];
 
+GLfloat ambient[4] = { 0.2, 0.1, 0.0, 1.0 };
+GLfloat diffuse[3] = { 1.0, 1.0, 1.0};
+GLfloat specular[3] = { 0, 0, 0 };
+GLfloat shininess = 0.25;
+
 Geometry::Geometry(string filename) {
 	m_filename = filename;
 	readOBJ(filename);
@@ -225,7 +230,13 @@ void Geometry::createDisplayListPoly() {
 	cout << "Creating Poly Geometry" << endl;
 	m_displayListPoly = glGenLists(1);
 	glNewList(m_displayListPoly, GL_COMPILE); 
-	glColor3f(0.2, 0.1, 0);
+	//glColor3f(0.2, 0.1, 0);
+
+	glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+	glMaterialf(GL_FRONT, GL_SHININESS, shininess*128.0);
+
 	glBegin(GL_TRIANGLES);
 	for (unsigned int i = 0; i < m_triangles.size(); i++){
 		for (int j = 0; j<3; j++){

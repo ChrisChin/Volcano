@@ -7,6 +7,7 @@
 
 #include "imageLoader.hpp"
 #include "shaderLoader.hpp"
+#include "shader.h"
 
 #include "volcano.hpp"
 #include "city.hpp"
@@ -38,6 +39,24 @@ float g_zoomFactor = 10;
 // Geometry loader and drawer
 //
 Geometry *g_geometry = nullptr;
+
+vec3 lightPosition(-1.93849, 11.233, 21.9049);
+vec3 lightDirection(-26.4, 355.2,0);
+
+unsigned int FBO;
+unsigned int renderTexture, depthTexture, shadowMap;
+int shadowMapWidth = 640 * 8;
+int shadowMapHeight = 480 * 8;
+mat4 shadowMatrix;	//light's modelviewprojectionmatrix
+mat4 modelMatrix;
+mat4 viewMatrix;
+mat4 projectionMatrix;
+//shader* mainShader;
+//shader* quadRenderShader;
+//shader* simpleShader;
+//shader* shadowShader;
+
+GLuint g_shader = 0;
 
 
 // Sets up where and what the light is
@@ -71,30 +90,130 @@ void setUpCamera() {
 	glRotatef(g_yRotation, 0, 1, 0);
 }
 
+//unsigned int createTexture(int w, int h, bool isDepth = false)
+//{
+//	unsigned int textureId;
+//	glGenTextures(1, &textureId);
+//	glBindTexture(GL_TEXTURE_2D, textureId);
+//	glTexImage2D(GL_TEXTURE_2D, 0, (!isDepth ? GL_RGBA8 : GL_DEPTH_COMPONENT), w, h, 0, isDepth ? GL_DEPTH_COMPONENT : GL_RGBA, GL_FLOAT, NULL);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+//
+//	int i;
+//	i = glGetError();
+//	if (i != 0)
+//	{
+//		std::cout << "Error happened while loading the texture: " << i << std::endl;
+//	}
+//	glBindTexture(GL_TEXTURE_2D, 0);
+//	return textureId;
+//}
+//void init(){
+//	renderTexture = createTexture(640, 480);
+//	depthTexture = createTexture(640, 480, true);
+//	shadowMap = createTexture(shadowMapWidth, shadowMapHeight, true);
+//}
+//
+//
+//void getImageFromLightPosition()
+//{
+//	//go to light's positon
+//	glLoadIdentity();
+//	glRotatef(lightDirection.x, 1, 0, 0);
+//	glRotatef(lightDirection.y, 0, 1, 0);
+//	glTranslatef(lightPosition.x, lightPosition.y, lightPosition.z);
+//	
+//	mat4 biasMatrix;
+//	biasMatrix[0][0] = 0.5; biasMatrix[0][1] = 0.0; biasMatrix[0][2] = 0.0; biasMatrix[0][3] = 0.0;
+//	biasMatrix[1][0] = 0.0; biasMatrix[1][1] = 0.5; biasMatrix[1][2] = 0.0; biasMatrix[1][3] = 0.0;
+//	biasMatrix[2][0] = 0.0; biasMatrix[2][1] = 0.0; biasMatrix[2][2] = 0.5; biasMatrix[2][3] = 0.0;
+//	biasMatrix[3][0] = 0.5; biasMatrix[3][1] = 0.5; biasMatrix[3][2] = 0.5; biasMatrix[3][3] = 1.0;
+//
+//	shadowMatrix = biasMatrix*projectionMatrix*viewMatrix*modelMatrix;
+//
+//	glViewport(0, 0, shadowMapWidth, shadowMapHeight);
+//
+//	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+//	glEnable(GL_CULL_FACE);
+//	glCullFace(GL_FRONT);
+//	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
+//	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMap, 0);
+//	glEnable(GL_DEPTH_TEST);
+//	glClear(GL_DEPTH_BUFFER_BIT);
+//	 // Use the shader we made
+//	 glUseProgram(g_shader);
+//
+//	 // Set our sampler (texture0) to use GL_TEXTURE0 as the source
+//	 glUniform1i(glGetUniformLocation(g_shader, "texture0"), 0);
+//	 glUseProgram(0);
+//
+//
+//	/*pipeline.updateMatrices(simpleShader->getProgramId());
+//	updateShadowMatrix(simpleShader->getProgramId());
+//	scene->draw(simpleShader->getProgramId());
+//	pipeline.translate(1, 2, 3);
+//	pipeline.rotateY(angle);
+//	pipeline.updateMatrices(simpleShader->getProgramId());
+//	updateShadowMatrix(simpleShader->getProgramId());
+//	monkey->draw(simpleShader->getProgramId());
+//
+//	simpleShader->delShader();
+//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+//	glDisable(GL_CULL_FACE);
+//	glViewport(0, 0, 640, 480);*/
+//
+//
+//
+//
+//}
+
+void initShader() {
+	g_shader = makeShaderProgram("Volcano/res/shaders/shaderDemo.vert", "Volcano/res/shaders/shaderDemo.frag");
+}
 
 // Draw function
 //
 void draw() {
 
-	// Set up camera every frame
-	setUpCamera();
-
 	// Black background
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
 	// Enable flags for normal rendering
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_NORMALIZE);
-	glEnable(GL_COLOR_MATERIAL);
 
-	// Set the current material (for all objects) to red
-	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+	initLight();
+	// Set up camera every frame
+	setUpCamera();
+
+	//// Black background
+	//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//// Enable flags for normal rendering
+	//glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_LIGHTING);
+	//glEnable(GL_NORMALIZE);
+	//glEnable(GL_COLOR_MATERIAL);
+
+	//// Set the current material (for all objects) to red
+	//glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+	
+	//getImageFromLightPosition();
+	//glUseProgram(g_shader);
+
+	// Set our sampler (texture0) to use GL_TEXTURE0 as the source
+	//glUniform1i(glGetUniformLocation(g_shader, "texture0"), 0);
 	
 	// Render geometry
 	g_geometry->renderGeometry();
-
+	glFlush();
+	glUseProgram(0);
 	// Disable flags for cleanup (optional)
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_LIGHTING);
@@ -215,6 +334,7 @@ int main(int argc, char **argv) {
 	
 	// Create a light on the camera
 	initLight();
+	initShader();
 
 	// Finally create our geometry
 	g_geometry = new Geometry("Volcano/res/assets/volcano.obj");
