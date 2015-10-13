@@ -183,3 +183,6 @@ void City::createNoiseMap(){
 
 }
 
+int getCityHeight(int x, int y){
+	return noiseMap[y][x];
+}
