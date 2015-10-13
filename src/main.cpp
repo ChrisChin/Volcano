@@ -101,23 +101,23 @@ bool Init(void){
 
 	glLoadIdentity();
 	gluPerspective(45.0f, (float)windowWidth / windowHeight, 1.0f, 100.0f);
-	glGetFloatv(GL_MODELVIEW_MATRIX, (GLfloat*)&cameraProjectionMatrix);
+	glGetFloatv(GL_MODELVIEW_MATRIX, (float*)cameraProjectionMatrix);
 
 	glLoadIdentity();
 	gluLookAt(cameraPosition.x, cameraPosition.y, cameraPosition.z,
 		0.0f, 0.0f, 0.0f,
 		0.0f, 1.0f, 0.0f);
-	glGetFloatv(GL_MODELVIEW_MATRIX, (GLfloat*)&cameraViewMatrix);
+	glGetFloatv(GL_MODELVIEW_MATRIX, (float*)cameraViewMatrix);
 
 	glLoadIdentity();
 	gluPerspective(45.0f, 1.0f, 2.0f, 8.0f);
-	glGetFloatv(GL_MODELVIEW_MATRIX, (GLfloat*)&lightProjectionMatrix);
+	glGetFloatv(GL_MODELVIEW_MATRIX, (float*)lightProjectionMatrix);
 
 	glLoadIdentity();
 	gluLookAt(lightPosition.x, lightPosition.y, lightPosition.z,
 		0.0f, 0.0f, 0.0f,
 		0.0f, 1.0f, 0.0f);
-	glGetFloatv(GL_MODELVIEW_MATRIX, (GLfloat*)&lightViewMatrix);
+	glGetFloatv(GL_MODELVIEW_MATRIX, (float*)lightViewMatrix);
 
 	glPopMatrix();
 	
@@ -219,17 +219,17 @@ void Display(void)
 {
 	setUpCamera();
 	//angle of spheres in scene. Calculate from time
-	float angle = 10;
+	float angle = 0;
 	glPushMatrix();
 
 	//First pass - from light's point of view
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glMatrixMode(GL_PROJECTION);
-	glLoadMatrixf((GLfloat*)&lightProjectionMatrix);
+	glLoadMatrixf((float*)lightProjectionMatrix);
 
 	glMatrixMode(GL_MODELVIEW);
-	glLoadMatrixf((GLfloat*)&lightViewMatrix);
+	glLoadMatrixf((float*)lightViewMatrix);
 
 	//Use viewport the same size as the shadow map
 	glViewport(0, 0, shadowMapSize, shadowMapSize);
@@ -257,15 +257,15 @@ void Display(void)
 	glClear(GL_DEPTH_BUFFER_BIT);
 
 	glMatrixMode(GL_PROJECTION);
-	glLoadMatrixf((GLfloat*)&cameraProjectionMatrix);
+	glLoadMatrixf((float*)cameraProjectionMatrix);
 
 	glMatrixMode(GL_MODELVIEW);
-	glLoadMatrixf((GLfloat*)&cameraViewMatrix);
+	glLoadMatrixf((float*)cameraViewMatrix);
 
 	glViewport(0, 0, windowWidth, windowHeight);
 
 	//Use dim light to represent shadowed areas
-	glLightfv(GL_LIGHT1, GL_POSITION, (GLfloat*)&lightPosition);
+	glLightfv(GL_LIGHT1, GL_POSITION, (float*)lightPosition);
 	glLightfv(GL_LIGHT1, GL_AMBIENT, dimwhite);
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, dimwhite);
 	glLightfv(GL_LIGHT1, GL_SPECULAR, black);
@@ -292,19 +292,19 @@ void Display(void)
 
 	//Set up texture coordinate generation.
 	glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
-	glTexGenfv(GL_S, GL_EYE_PLANE, (GLfloat*)&textureMatrix[0]);
+	glTexGenfv(GL_S, GL_EYE_PLANE, (float*)textureMatrix[0]);
 	glEnable(GL_TEXTURE_GEN_S);
 
 	glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
-	glTexGenfv(GL_T, GL_EYE_PLANE, (GLfloat*)&textureMatrix[1]);
+	glTexGenfv(GL_T, GL_EYE_PLANE, (float*)textureMatrix[1]);
 	glEnable(GL_TEXTURE_GEN_T);
 
 	glTexGeni(GL_R, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
-	glTexGenfv(GL_R, GL_EYE_PLANE, (GLfloat*)&textureMatrix[2]);
+	glTexGenfv(GL_R, GL_EYE_PLANE, (float*)textureMatrix[2]);
 	glEnable(GL_TEXTURE_GEN_R);
 
 	glTexGeni(GL_Q, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
-	glTexGenfv(GL_Q, GL_EYE_PLANE, (GLfloat*)&textureMatrix[3]);
+	glTexGenfv(GL_Q, GL_EYE_PLANE, (float*)textureMatrix[3]);
 	glEnable(GL_TEXTURE_GEN_Q);
 
 	//Bind & enable shadow map texture
@@ -374,7 +374,7 @@ void Reshape(int w, int h)
 	glPushMatrix();
 	glLoadIdentity();
 	gluPerspective(45.0f, (float)windowWidth / windowHeight, 1.0f, 100.0f);
-	glGetFloatv(GL_MODELVIEW_MATRIX, (GLfloat*)&cameraProjectionMatrix);
+	glGetFloatv(GL_MODELVIEW_MATRIX, (float*)cameraProjectionMatrix);
 	glPopMatrix();
 }
 
