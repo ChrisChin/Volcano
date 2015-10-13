@@ -15,6 +15,14 @@
 using namespace std;
 using namespace comp308;
 
+float minHeight;
+float maxHeight;
+float minX;
+float maxX;
+float minZ;
+float maxZ;
+float heightMap[60][60];
+
 Geometry::Geometry(string filename) {
 	m_filename = filename;
 	readOBJ(filename);
