@@ -8,6 +8,7 @@
 
 #include "comp308.hpp"
 #include "city.hpp"
+#include "imageLoader.hpp"
 
 
 
@@ -35,10 +36,12 @@ int Roadgap = mapX/5;
 
 
 //Texture info
-GLuint g_textures[1];
+GLuint g_texture = 0;
+GLuint g_textures[2];
 
 City::City(){
 	createNoiseMap();
+	initTexture();
 }
 
 void City::render(){
@@ -46,66 +49,103 @@ void City::render(){
 	glClear( GL_COLOR_BUFFER_BIT); 
 	
 	glPushMatrix();
-	glTranslatef(-5.0, 0.0, 40.0);
+	glTranslatef(-50.0, 0.0, 30.0);
 
-	//City Base
-	glColor3f(1.0, 0.894, 0.769);
-	glBegin(GL_QUADS);
-		glVertex3f(0.0, -1.0, 0.0);
-  		glVertex3f(mapX*Hlength, -1.0, 0.0);
-  		glVertex3f(mapX*Hlength, -1.0, mapY*Hlength);
-  		glVertex3f(0.0, -1.0, mapY*Hlength);
-	glEnd();
-  	glFlush();
-	
-
-  	initTexture();
 
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); 
 	
 	glBindTexture(GL_TEXTURE_2D, g_textures[0]);
+
+
+	glMatrixMode(GL_TEXTURE);
+	glScalef(5.0f,5.0f,5.0f);
+	glMatrixMode(GL_MODELVIEW);
+	//City Base
+	//glColor3f(1.0, 0.894, 0.769);
+	glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 0.0f);
+		glVertex3f(0.0, -1.0, 0.0);
+		glTexCoord2f(0.0f, 1.0f);
+  		glVertex3f(mapX*Hlength, -1.0, 0.0);
+  		glTexCoord2f(1.0f, 1.0f);
+  		glVertex3f(mapX*Hlength, -1.0, mapY*Hlength);
+  		glTexCoord2f(1.0f, 0.0f);
+  		glVertex3f(0.0, -1.0, mapY*Hlength);
+	glEnd();
+  	glFlush();
+	
+	
+
+  	
+	glBindTexture(GL_TEXTURE_2D, g_textures[1]);
+	
 	if(noiseMapCreated){
 		for(int a=0; a<mapY; a++){
 			for(int b=0; b<mapX; b++){
 				if(noiseMap[a][b]!=(-1)){
 
-					glColor3f(colourMap[a][b]->x, colourMap[a][b]->y, colourMap[a][b]->z);
+					glBindTexture(GL_TEXTURE_2D, g_textures[1]);
+					//glColor3f(colourMap[a][b]->x, colourMap[a][b]->y, colourMap[a][b]->z);
 					//floor
 					glBegin(GL_QUADS);
+					glTexCoord2f(0.0f, 0.0f);
 					glVertex3f(b*Hlength, 0.0, a*Hlength);
+					glTexCoord2f(0.0f, 1.0f);
   					glVertex3f((b*Hlength)+Hlength, 0.0,  a*Hlength);
+  					glTexCoord2f(1.0f, 1.0f);
   					glVertex3f((b*Hlength)+Hlength, 0.0, (a*Hlength)+Hlength);
+  					glTexCoord2f(1.0f, 0.0f);
   					glVertex3f(b*Hlength, 0.0, (a*Hlength)+Hlength);
   				
   					//left
+  					glTexCoord2f(0.0f, 0.0f);
   					glVertex3f(b*Hlength, 0.0, a*Hlength);
+  					glTexCoord2f(0.0f, 1.0f);
   					glVertex3f(b*Hlength, noiseMap[a][b], a*Hlength);
+  					glTexCoord2f(1.0f, 1.0f);
   					glVertex3f(b*Hlength, noiseMap[a][b], (a*Hlength)+Hlength);
+  					glTexCoord2f(1.0f, 0.0f);
   					glVertex3f(b*Hlength, 0.0, (a*Hlength)+Hlength);
 
   					//back
+  					glTexCoord2f(0.0f, 0.0f);
   					glVertex3f(b*Hlength, 0.0, a*Hlength);
+  					glTexCoord2f(0.0f, 1.0f);
   					glVertex3f(b*Hlength, noiseMap[a][b], a*Hlength);
+  					glTexCoord2f(1.0f, 1.0f);
   					glVertex3f((b*Hlength)+Hlength, noiseMap[a][b], a*Hlength);
+  					glTexCoord2f(1.0f, 0.0f);
   					glVertex3f((b*Hlength)+Hlength, 0.0, a*Hlength);
 
   					//right
+  					glTexCoord2f(0.0f, 0.0f);
   					glVertex3f((b*Hlength)+Hlength, 0.0, a*Hlength);
+  					glTexCoord2f(0.0f, 1.0f);
   					glVertex3f((b*Hlength)+Hlength, noiseMap[a][b], a*Hlength);
+  					glTexCoord2f(1.0f, 1.0f);
   					glVertex3f((b*Hlength)+Hlength, noiseMap[a][b], (a*Hlength)+Hlength);
+  					glTexCoord2f(1.0f, 0.0f);
   					glVertex3f((b*Hlength)+Hlength, 0.0, (a*Hlength)+Hlength);
 
   					//front
+  					glTexCoord2f(0.0f, 0.0f);
   					glVertex3f(b*Hlength, 0.0, (a*Hlength)+Hlength);
+  					glTexCoord2f(0.0f, 1.0f);
   					glVertex3f(b*Hlength, noiseMap[a][b], (a*Hlength)+Hlength);
+  					glTexCoord2f(1.0f, 1.0f);
   					glVertex3f((b*Hlength)+Hlength, noiseMap[a][b], (a*Hlength)+Hlength);
+  					glTexCoord2f(1.0f, 0.0f);
   					glVertex3f((b*Hlength)+Hlength, 0.0, (a*Hlength)+Hlength);
 
   					//top
+  					glTexCoord2f(0.0f, 0.0f);
   					glVertex3f(b*Hlength,noiseMap[a][b] , a*Hlength);
+  					glTexCoord2f(0.0f, 1.0f);
   					glVertex3f((b*Hlength)+Hlength, noiseMap[a][b],  a*Hlength);
+  					glTexCoord2f(1.0f, 1.0f);
   					glVertex3f((b*Hlength)+Hlength, noiseMap[a][b], (a*Hlength)+Hlength);
+  					glTexCoord2f(1.0f, 0.0f);
   					glVertex3f(b*Hlength, noiseMap[a][b], (a*Hlength)+Hlength);
   					glEnd();
   					glFlush(); 
@@ -118,7 +158,7 @@ void City::render(){
  	//glFlush(); 
 
 	
-	
+	glDisable(GL_TEXTURE_2D);
 }
 
 void City::createNoiseMap(){
@@ -183,13 +223,12 @@ void City::createNoiseMap(){
 
 }
 
-int getCityHeight(int x, int y){
+int City::getCityHeight(int x, int y){
 	return noiseMap[y][x];
 }
 
-void initTexture(){
-
-	image tex("work/res/textures/stonewall.jpg");
+void City::loadTexture(GLuint num, std::string name){
+	image tex("Volcano/res/textures/" + name + ".jpg");
 	glActiveTexture(GL_TEXTURE0); // Use slot 0, need to use GL_TEXTURE1 ... etc if using more than one texture PER OBJECT
 	glGenTextures(1, &g_texture); // Generate texture ID
 	//glBindTexture(GL_TEXTURE_2D, g_texture); // Bind it as a 2D texture
@@ -207,4 +246,18 @@ void initTexture(){
 	// Finnaly, actually fill the data into our texture
 	
 	gluBuild2DMipmaps(GL_TEXTURE_2D, 3, tex.w, tex.h, tex.glFormat(), GL_UNSIGNED_BYTE, tex.dataPointer());
+
+
+
+
+}
+
+void City::initTexture() {
+	
+	glGenTextures(2, g_textures); // Generate texture ID
+	loadTexture(g_textures[0], "stonewall");
+	loadTexture(g_textures[1], "stoneroad");
+	
+
+	
 }

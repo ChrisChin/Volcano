@@ -18,4 +18,5 @@ public:
 	void createNoiseMap();
 	int getCityHeight(int x, int y);
 	void initTexture();
+	void loadTexture(GLuint num, std::string name);
 };

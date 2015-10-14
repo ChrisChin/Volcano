@@ -92,13 +92,21 @@ void draw() {
 	glEnable(GL_NORMALIZE);
 	glEnable(GL_COLOR_MATERIAL);
 
+		
 	// Set the current material (for all objects) to red
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-	glColor3f(1.0f, 0.0f, 0.0f);
+	
 
 	// Render geometry
-	g_geometry->renderGeometry();
+	
 	city->render();
+
+
+	glColor3f(1.0f, 0.0f, 0.0f);
+	g_geometry->renderGeometry();
+
+
+	
 
 	// Disable flags for cleanup (optional)
 	glDisable(GL_DEPTH_TEST);
