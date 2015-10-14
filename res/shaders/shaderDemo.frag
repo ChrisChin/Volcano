@@ -14,15 +14,26 @@
 
 #version 120
 
-// Constant across both shaders
-uniform sampler2D texture0;
+uniform sampler2D ShadowMap;
 
-// Values passed in from the vertex shader
-varying vec3 vNormal;
-varying vec3 vPosition;
-varying vec2 vTextureCoord0;
+varying vec4 ShadowCoord;
 
-void main() {
-	gl_FragColor = texture2D(texture0, vTextureCoord0);
-	//gl_FragColor.rgb = vPosition;
+void main()
+{	
+	vec4 shadowCoordinateWdivide = ShadowCoord / ShadowCoord.w ;
+	
+	// Used to lower moirÃ© pattern and self-shadowing
+	shadowCoordinateWdivide.z += 0.0005;
+	
+	
+	float distanceFromLight = texture2D(ShadowMap,shadowCoordinateWdivide.st).z;
+	
+	
+ 	float shadow = 1.0;
+ 	if (ShadowCoord.w > 0.0)
+ 		shadow = distanceFromLight < shadowCoordinateWdivide.z ? 0.5 : 1.0 ;
+  	
+	
+  	gl_FragColor =	 shadow * gl_Color;
+  
 }
