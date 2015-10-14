@@ -39,6 +39,7 @@ float g_zoomFactor = 10;
 // Geometry loader and drawer
 //
 Geometry *g_geometry = nullptr;
+Lava *lava = nullptr;
 
 vec3 lightPosition(-1.93849, 11.233, 21.9049);
 vec3 lightDirection(-26.4, 355.2,0);
@@ -269,7 +270,7 @@ void drawObjects(void)
 }
 
 void initShader() {
-	g_shader = makeShaderProgram("Volcano/res/shaders/shaderDemo.vert", "Volcano/res/shaders/shaderDemo.frag");
+	g_shader = makeShaderProgram("../Volcano/res/shaders/shaderDemo.vert", "../Volcano/res/shaders/shaderDemo.frag");
 }
 
 void draw() {
@@ -342,6 +343,7 @@ void draw() {
 	}
 	else{
 		g_geometry->renderGeometry();
+		lava->renderLava();
 	}
 
 	
@@ -425,6 +427,32 @@ void mouseMotionCallback(int x, int y) {
 	}
 }
 
+//Lava flow
+void createMoreLava(int j){ //creates lava flow  -nonstop
+for (int i =0;i < 10 ;i++)				// Initials All The Textures
+	{
+		particle p;
+		p.x = 30;
+		p.y = 0;
+		p.z = 30;
+		p.alive=true;								// Make All The particless alive
+		p.life=50;								// Give All The particless Full Life
+		p.fade=0.05f;								// Random Fade Speed
+		p.r=1.0f;							// Select Red Rainbow Color
+		p.g=0.4f;							// Select Red Rainbow Color
+		p.b=0.0f;							// Select Red Rainbow Color
+		p.xi=120.0f;								// Random Speed On X Axis
+		p.yi=0.0f;								// Random Speed On Y Axis
+		p.zi=float(rand()%40)+80.0f;						// Random Speed On Z Axis
+		p.xg=0.0f;								// Set Horizontal Pull To Zero
+		p.yg=-0.8f;								// Set Vertical Pull Downward
+		p.zg=0.0f;								// Set Pull On Z Axis To Zero
+		lava->particles.push_back(p);
+	}
+
+	glutTimerFunc(100,createMoreLava,1); 					//flow at 100 milliseconds
+}
+
 //Main program
 // 
 int main(int argc, char **argv) {
@@ -469,7 +497,11 @@ int main(int argc, char **argv) {
 	initShader();
 
 	// Finally create our geometry
-	g_geometry = new Geometry("Volcano/res/assets/volcano.obj");
+	g_geometry = new Geometry("../Volcano/res/assets/volcano.obj");
+
+	//Initate Lava
+	lava = new Lava();
+	createMoreLava(1);
 
 	// Loop required by GLUT
 	// This will not return until we tell GLUT to finish
