@@ -64,7 +64,7 @@ GLuint g_shader = 0;
 
 
 //Camera position
-float p_camera[3] = { 332, 20, 0 };
+float p_camera[3] = { 32, 20, 0 };
 
 //Camera lookAt
 float l_camera[3] = { 2, 0, -10 };
@@ -293,8 +293,8 @@ void renderScene(void)
 
 	// Culling switching, rendering only backface, this is done to avoid self-shadowing
 	glCullFace(GL_FRONT);
-	//drawObjects();
-	g_geometry->renderGeometry();
+	drawObjects();
+	//g_geometry->renderGeometry();
 	//Save modelview/projection matrice into texture7, also add a biais
 	setTextureMatrix();
 	
@@ -320,8 +320,8 @@ void renderScene(void)
 	setupMatrices(p_camera[0], p_camera[1], p_camera[2], l_camera[0], l_camera[1], l_camera[2]);
 
 	glCullFace(GL_BACK);
-	//drawObjects();
-	g_geometry->renderGeometry();
+	drawObjects();
+	//g_geometry->renderGeometry();
 
 	// DEBUG only. this piece of code draw the depth buffer onscreen
 	/*
