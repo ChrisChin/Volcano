@@ -70,10 +70,10 @@ float p_camera[3] = { 32, 20, 0 };
 float l_camera[3] = { 2, 0, -10 };
 
 //Light position
-float p_light[3] = { 3, 20, 0 };
+float p_light[3] = { 3, 5, 0 };
 
 //Light lookAt
-float l_light[3] = { 0, 0, -5 };
+float l_light[3] = { 0, 2, -5 };
 
 
 //Light mouvement circle radius
@@ -209,8 +209,7 @@ void setTextureMatrix(void)
 	// Grab modelview and transformation matrices
 	glGetDoublev(GL_MODELVIEW_MATRIX, modelView);
 	glGetDoublev(GL_PROJECTION_MATRIX, projection);
-
-
+	
 	glMatrixMode(GL_TEXTURE);
 	glActiveTextureARB(GL_TEXTURE7);
 
@@ -266,13 +265,11 @@ void drawObjects(void)
 	startTranslate(0, 4, -5);
 	glutSolidCube(4);
 	endTranslate();
-
-
 }
 
 void renderScene(void)
 {
-	update();
+	setUpCamera();
 
 	//First step: Render from the light POV to a FBO, story depth values only
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);	//Rendering offscreen
@@ -295,6 +292,7 @@ void renderScene(void)
 	glCullFace(GL_FRONT);
 	drawObjects();
 	//g_geometry->renderGeometry();
+
 	//Save modelview/projection matrice into texture7, also add a biais
 	setTextureMatrix();
 	
@@ -310,8 +308,8 @@ void renderScene(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//Using the shadow shader
-	glUseProgramObjectARB(shadowShaderId);
-	glUniform1iARB(shadowMapUniform, 7);
+	//glUseProgramObjectARB(shadowShaderId);
+	//glUniform1iARB(shadowMapUniform, 7);
 	glUseProgram(g_shader);
 	glUniform1i(glGetUniformLocation(g_shader, "ShadowMap"), 0);
 	glActiveTextureARB(GL_TEXTURE7);
@@ -322,7 +320,8 @@ void renderScene(void)
 	glCullFace(GL_BACK);
 	drawObjects();
 	//g_geometry->renderGeometry();
-
+	glUseProgram(0);
+	glFlush();
 	// DEBUG only. this piece of code draw the depth buffer onscreen
 	/*
 	glUseProgramObjectARB(0);
@@ -355,85 +354,6 @@ void processNormalKeys(unsigned char key, int x, int y) {
 	if (key == 27)
 		exit(0);
 }
-
-//unsigned int createTexture(int w, int h, bool isDepth = false)
-//{
-//	unsigned int textureId;
-//	glGenTextures(1, &textureId);
-//	glBindTexture(GL_TEXTURE_2D, textureId);
-//	glTexImage2D(GL_TEXTURE_2D, 0, (!isDepth ? GL_RGBA8 : GL_DEPTH_COMPONENT), w, h, 0, isDepth ? GL_DEPTH_COMPONENT : GL_RGBA, GL_FLOAT, NULL);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-//
-//	int i;
-//	i = glGetError();
-//	if (i != 0)
-//	{
-//		std::cout << "Error happened while loading the texture: " << i << std::endl;
-//	}
-//	glBindTexture(GL_TEXTURE_2D, 0);
-//	return textureId;
-//}
-//void init(){
-//	renderTexture = createTexture(640, 480);
-//	depthTexture = createTexture(640, 480, true);
-//	shadowMap = createTexture(shadowMapWidth, shadowMapHeight, true);
-//}
-//
-//
-//void getImageFromLightPosition()
-//{
-//	//go to light's positon
-//	glLoadIdentity();
-//	glRotatef(lightDirection.x, 1, 0, 0);
-//	glRotatef(lightDirection.y, 0, 1, 0);
-//	glTranslatef(lightPosition.x, lightPosition.y, lightPosition.z);
-//	
-//	mat4 biasMatrix;
-//	biasMatrix[0][0] = 0.5; biasMatrix[0][1] = 0.0; biasMatrix[0][2] = 0.0; biasMatrix[0][3] = 0.0;
-//	biasMatrix[1][0] = 0.0; biasMatrix[1][1] = 0.5; biasMatrix[1][2] = 0.0; biasMatrix[1][3] = 0.0;
-//	biasMatrix[2][0] = 0.0; biasMatrix[2][1] = 0.0; biasMatrix[2][2] = 0.5; biasMatrix[2][3] = 0.0;
-//	biasMatrix[3][0] = 0.5; biasMatrix[3][1] = 0.5; biasMatrix[3][2] = 0.5; biasMatrix[3][3] = 1.0;
-//
-//	shadowMatrix = biasMatrix*projectionMatrix*viewMatrix*modelMatrix;
-//
-//	glViewport(0, 0, shadowMapWidth, shadowMapHeight);
-//
-//	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-//	glEnable(GL_CULL_FACE);
-//	glCullFace(GL_FRONT);
-//	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
-//	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMap, 0);
-//	glEnable(GL_DEPTH_TEST);
-//	glClear(GL_DEPTH_BUFFER_BIT);
-//	 // Use the shader we made
-//	 glUseProgram(g_shader);
-//
-//	 // Set our sampler (texture0) to use GL_TEXTURE0 as the source
-//	 glUniform1i(glGetUniformLocation(g_shader, "texture0"), 0);
-//	 glUseProgram(0);
-//
-//
-//	/*pipeline.updateMatrices(simpleShader->getProgramId());
-//	updateShadowMatrix(simpleShader->getProgramId());
-//	scene->draw(simpleShader->getProgramId());
-//	pipeline.translate(1, 2, 3);
-//	pipeline.rotateY(angle);
-//	pipeline.updateMatrices(simpleShader->getProgramId());
-//	updateShadowMatrix(simpleShader->getProgramId());
-//	monkey->draw(simpleShader->getProgramId());
-//
-//	simpleShader->delShader();
-//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-//	glDisable(GL_CULL_FACE);
-//	glViewport(0, 0, 640, 480);*/
-//
-//
-//
-//
-//}
 
 void initShader() {
 	g_shader = makeShaderProgram("Volcano/res/shaders/shaderDemo.vert", "Volcano/res/shaders/shaderDemo.frag");
@@ -477,6 +397,56 @@ void draw() {
 	//glUniform1i(glGetUniformLocation(g_shader, "texture0"), 0);
 	
 	// Render geometry
+
+
+	//First step: Render from the light POV to a FBO, story depth values only
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);	//Rendering offscreen
+
+	//Using the fixed pipeline to render to the depthbuffer
+	glUseProgramObjectARB(0);
+
+	// In the case we render the shadowmap to a higher resolution, the viewport must be modified accordingly.
+	glViewport(0, 0, RENDER_WIDTH * SHADOW_MAP_RATIO, RENDER_HEIGHT* SHADOW_MAP_RATIO);
+
+	// Clear previous frame values
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	//Disable color rendering, we only want to write to the Z-Buffer
+	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+
+	setupMatrices(p_light[0], p_light[1], p_light[2], l_light[0], l_light[1], l_light[2]);
+
+	// Culling switching, rendering only backface, this is done to avoid self-shadowing
+	glCullFace(GL_FRONT);
+	//drawObjects();
+	g_geometry->renderGeometry();
+
+	//Save modelview/projection matrice into texture7, also add a biais
+	setTextureMatrix();
+
+	// Now rendering from the camera POV, using the FBO to generate shadows
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
+	glViewport(0, 0, RENDER_WIDTH, RENDER_HEIGHT);
+
+	//Enabling color write (previously disabled for light POV z-buffer rendering)
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+	// Clear previous frame values
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//Using the shadow shader
+	//glUseProgramObjectARB(shadowShaderId);
+	//glUniform1iARB(shadowMapUniform, 7);
+	glUseProgram(g_shader);
+	glUniform1i(glGetUniformLocation(g_shader, "ShadowMap"), 0);
+	glActiveTextureARB(GL_TEXTURE7);
+	glBindTexture(GL_TEXTURE_2D, depthTextureId);
+
+	//setupMatrices(p_camera[0], p_camera[1], p_camera[2], l_camera[0], l_camera[1], l_camera[2]);
+	setUpCamera();
+	glCullFace(GL_BACK);
+	//drawObjects();
 	g_geometry->renderGeometry();
 	glFlush();
 	glUseProgram(0);
@@ -589,7 +559,7 @@ int main(int argc, char **argv) {
 	cout << "Using GLEW " << glewGetString(GLEW_VERSION) << endl;
 	
 	// Register functions for callback
-	glutDisplayFunc(renderScene);
+	glutDisplayFunc(draw);
 	glutReshapeFunc(reshape);
 
 	glutKeyboardFunc(keyboardCallback);
