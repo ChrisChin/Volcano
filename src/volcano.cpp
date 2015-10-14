@@ -21,12 +21,16 @@ float minX;
 float maxX;
 float minZ;
 float maxZ;
+
 float heightMap[60][60];
 
 GLfloat ambient[4] = { 0.2, 0.1, 0.0, 1.0 };
 GLfloat diffuse[3] = { 1.0, 1.0, 1.0};
 GLfloat specular[3] = { 0, 0, 0 };
 GLfloat shininess = 0.25;
+float Geometry::getHeight(int x, int z){
+	return heightMap[x + 30][z + 30];
+}
 
 Geometry::Geometry(string filename) {
 	m_filename = filename;
