@@ -89,6 +89,7 @@ GLuint depthTextureId;
 GLhandleARB shadowShaderId;
 GLuint shadowMapUniform;
 
+bool useShadowMap = false;
 
 // Sets up where and what the light is
 // Called once on start up
@@ -267,100 +268,10 @@ void drawObjects(void)
 	endTranslate();
 }
 
-void renderScene(void)
-{
-	setUpCamera();
-
-	//First step: Render from the light POV to a FBO, story depth values only
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);	//Rendering offscreen
-
-	//Using the fixed pipeline to render to the depthbuffer
-	glUseProgramObjectARB(0);
-
-	// In the case we render the shadowmap to a higher resolution, the viewport must be modified accordingly.
-	glViewport(0, 0, RENDER_WIDTH * SHADOW_MAP_RATIO, RENDER_HEIGHT* SHADOW_MAP_RATIO);
-
-	// Clear previous frame values
-	glClear(GL_DEPTH_BUFFER_BIT);
-
-	//Disable color rendering, we only want to write to the Z-Buffer
-	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-
-	setupMatrices(p_light[0], p_light[1], p_light[2], l_light[0], l_light[1], l_light[2]);
-
-	// Culling switching, rendering only backface, this is done to avoid self-shadowing
-	glCullFace(GL_FRONT);
-	drawObjects();
-	//g_geometry->renderGeometry();
-
-	//Save modelview/projection matrice into texture7, also add a biais
-	setTextureMatrix();
-	
-	// Now rendering from the camera POV, using the FBO to generate shadows
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-
-	glViewport(0, 0, RENDER_WIDTH, RENDER_HEIGHT);
-
-	//Enabling color write (previously disabled for light POV z-buffer rendering)
-	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-
-	// Clear previous frame values
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	//Using the shadow shader
-	//glUseProgramObjectARB(shadowShaderId);
-	//glUniform1iARB(shadowMapUniform, 7);
-	glUseProgram(g_shader);
-	glUniform1i(glGetUniformLocation(g_shader, "ShadowMap"), 0);
-	glActiveTextureARB(GL_TEXTURE7);
-	glBindTexture(GL_TEXTURE_2D, depthTextureId);
-
-	setupMatrices(p_camera[0], p_camera[1], p_camera[2], l_camera[0], l_camera[1], l_camera[2]);
-
-	glCullFace(GL_BACK);
-	drawObjects();
-	//g_geometry->renderGeometry();
-	glUseProgram(0);
-	glFlush();
-	// DEBUG only. this piece of code draw the depth buffer onscreen
-	/*
-	glUseProgramObjectARB(0);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(-RENDER_WIDTH/2,RENDER_WIDTH/2,-RENDER_HEIGHT/2,RENDER_HEIGHT/2,1,20);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glColor4f(1,1,1,1);
-	glActiveTextureARB(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D,depthTextureId);
-	glEnable(GL_TEXTURE_2D);
-	glTranslated(0,0,-1);
-	glBegin(GL_QUADS);
-	glTexCoord2d(0,0);glVertex3f(0,0,0);
-	glTexCoord2d(1,0);glVertex3f(RENDER_WIDTH/2,0,0);
-	glTexCoord2d(1,1);glVertex3f(RENDER_WIDTH/2,RENDER_HEIGHT/2,0);
-	glTexCoord2d(0,1);glVertex3f(0,RENDER_HEIGHT/2,0);
-
-
-	glEnd();
-	glDisable(GL_TEXTURE_2D);
-	*/
-
-	glutSwapBuffers();
-}
-
-void processNormalKeys(unsigned char key, int x, int y) {
-
-	if (key == 27)
-		exit(0);
-}
-
 void initShader() {
 	g_shader = makeShaderProgram("Volcano/res/shaders/shaderDemo.vert", "Volcano/res/shaders/shaderDemo.frag");
 }
 
-// Draw function
-//
 void draw() {
 
 	// Black background
@@ -376,80 +287,64 @@ void draw() {
 	initLight();
 	// Set up camera every frame
 	setUpCamera();
+	if (useShadowMap){
+		//First step: Render from the light POV to a FBO, story depth values only
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);	//Rendering offscreen
 
-	//// Black background
-	//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//Using the fixed pipeline to render to the depthbuffer
+		glUseProgramObjectARB(0);
 
-	//// Enable flags for normal rendering
-	//glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_LIGHTING);
-	//glEnable(GL_NORMALIZE);
-	//glEnable(GL_COLOR_MATERIAL);
+		// In the case we render the shadowmap to a higher resolution, the viewport must be modified accordingly.
+		glViewport(0, 0, RENDER_WIDTH * SHADOW_MAP_RATIO, RENDER_HEIGHT* SHADOW_MAP_RATIO);
 
-	//// Set the current material (for all objects) to red
-	//glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+		// Clear previous frame values
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		//Disable color rendering, we only want to write to the Z-Buffer
+		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+
+		setupMatrices(p_light[0], p_light[1], p_light[2], l_light[0], l_light[1], l_light[2]);
+
+		// Culling switching, rendering only backface, this is done to avoid self-shadowing
+		glCullFace(GL_FRONT);
+		//drawObjects();
+		g_geometry->renderGeometry();
+
+		//Save modelview/projection matrice into texture7, also add a biais
+		setTextureMatrix();
+
+		// Now rendering from the camera POV, using the FBO to generate shadows
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
+		glViewport(0, 0, RENDER_WIDTH, RENDER_HEIGHT);
+
+		//Enabling color write (previously disabled for light POV z-buffer rendering)
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+		// Clear previous frame values
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		//Using the shadow shader
+		//glUseProgramObjectARB(shadowShaderId);
+		//glUniform1iARB(shadowMapUniform, 7);
+		glUseProgram(g_shader);
+		glUniform1i(glGetUniformLocation(g_shader, "ShadowMap"), 0);
+		glActiveTextureARB(GL_TEXTURE7);
+		glBindTexture(GL_TEXTURE_2D, depthTextureId);
+
+		//setupMatrices(p_camera[0], p_camera[1], p_camera[2], l_camera[0], l_camera[1], l_camera[2]);
+		setUpCamera();
+		glCullFace(GL_BACK);
+		//drawObjects();
+		g_geometry->renderGeometry();
+		glFlush();
+		glUseProgram(0);
+	}
+	else{
+		g_geometry->renderGeometry();
+	}
+
 	
-	//getImageFromLightPosition();
-	//glUseProgram(g_shader);
-
-	// Set our sampler (texture0) to use GL_TEXTURE0 as the source
-	//glUniform1i(glGetUniformLocation(g_shader, "texture0"), 0);
-	
-	// Render geometry
-
-
-	//First step: Render from the light POV to a FBO, story depth values only
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);	//Rendering offscreen
-
-	//Using the fixed pipeline to render to the depthbuffer
-	glUseProgramObjectARB(0);
-
-	// In the case we render the shadowmap to a higher resolution, the viewport must be modified accordingly.
-	glViewport(0, 0, RENDER_WIDTH * SHADOW_MAP_RATIO, RENDER_HEIGHT* SHADOW_MAP_RATIO);
-
-	// Clear previous frame values
-	glClear(GL_DEPTH_BUFFER_BIT);
-
-	//Disable color rendering, we only want to write to the Z-Buffer
-	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-
-	setupMatrices(p_light[0], p_light[1], p_light[2], l_light[0], l_light[1], l_light[2]);
-
-	// Culling switching, rendering only backface, this is done to avoid self-shadowing
-	glCullFace(GL_FRONT);
-	//drawObjects();
-	g_geometry->renderGeometry();
-
-	//Save modelview/projection matrice into texture7, also add a biais
-	setTextureMatrix();
-
-	// Now rendering from the camera POV, using the FBO to generate shadows
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-
-	glViewport(0, 0, RENDER_WIDTH, RENDER_HEIGHT);
-
-	//Enabling color write (previously disabled for light POV z-buffer rendering)
-	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-
-	// Clear previous frame values
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	//Using the shadow shader
-	//glUseProgramObjectARB(shadowShaderId);
-	//glUniform1iARB(shadowMapUniform, 7);
-	glUseProgram(g_shader);
-	glUniform1i(glGetUniformLocation(g_shader, "ShadowMap"), 0);
-	glActiveTextureARB(GL_TEXTURE7);
-	glBindTexture(GL_TEXTURE_2D, depthTextureId);
-
-	//setupMatrices(p_camera[0], p_camera[1], p_camera[2], l_camera[0], l_camera[1], l_camera[2]);
-	setUpCamera();
-	glCullFace(GL_BACK);
-	//drawObjects();
-	g_geometry->renderGeometry();
-	glFlush();
-	glUseProgram(0);
 	// Disable flags for cleanup (optional)
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_LIGHTING);
