@@ -1,9 +1,6 @@
 
 
 
-
-
-
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -61,6 +58,9 @@ void City::render(){
 	glEnd();
   	glFlush();
 	
+
+  	initTexture();
+
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); 
 	
@@ -185,4 +185,26 @@ void City::createNoiseMap(){
 
 int getCityHeight(int x, int y){
 	return noiseMap[y][x];
+}
+
+void initTexture(){
+
+	image tex("work/res/textures/stonewall.jpg");
+	glActiveTexture(GL_TEXTURE0); // Use slot 0, need to use GL_TEXTURE1 ... etc if using more than one texture PER OBJECT
+	glGenTextures(1, &g_texture); // Generate texture ID
+	//glBindTexture(GL_TEXTURE_2D, g_texture); // Bind it as a 2D texture
+
+	glBindTexture(GL_TEXTURE_2D, num); // Bind it as a 2D texture
+
+	
+	// Setup sampling strategies
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	// Finnaly, actually fill the data into our texture
+	
+	gluBuild2DMipmaps(GL_TEXTURE_2D, 3, tex.w, tex.h, tex.glFormat(), GL_UNSIGNED_BYTE, tex.dataPointer());
 }

@@ -17,4 +17,5 @@ public:
 	void render();
 	void createNoiseMap();
 	int getCityHeight(int x, int y);
+	void initTexture();
 };
