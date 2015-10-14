@@ -12,6 +12,8 @@ SET(headers
 	"lava.hpp"
 	"city.hpp"
 	"weather.hpp"
+	"shader.h"
+	"GLee.h"
 )
 
 
@@ -22,7 +24,8 @@ SET(sources
 	"lava.cpp"
 	"city.cpp"
 	"weather.cpp"
-
+	"shader.cpp"
+	"GLee.c"
 )
 
 # Add executable target and link libraries
