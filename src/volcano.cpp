@@ -21,7 +21,12 @@ float minX;
 float maxX;
 float minZ;
 float maxZ;
+
 float heightMap[60][60];
+
+float Geometry::getHeight(int x, int z){
+	return heightMap[x + 30][z + 30];
+}
 
 Geometry::Geometry(string filename) {
 	m_filename = filename;
