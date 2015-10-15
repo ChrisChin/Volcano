@@ -35,6 +35,9 @@ int Hrange = 3;
 int Roadgap = mapX/5;
 
 
+bool firsttime = true;
+
+
 //Texture info
 GLuint g_texture = 0;
 GLuint g_textures[2];
@@ -57,10 +60,11 @@ void City::render(){
 	
 	glBindTexture(GL_TEXTURE_2D, g_textures[0]);
 
-
-	// glMatrixMode(GL_TEXTURE);
-	// glScalef(5.0f,5.0f,5.0f);
-	// glMatrixMode(GL_MODELVIEW);
+	
+	glMatrixMode(GL_TEXTURE);
+	glScalef(40.0f,40.0f,40.0f);
+	glMatrixMode(GL_MODELVIEW);
+	
 	//City Base
 	//glColor3f(1.0, 0.894, 0.769);
 	glBegin(GL_QUADS);
@@ -77,7 +81,13 @@ void City::render(){
 	
 	
 
+	
+	glMatrixMode(GL_TEXTURE);
+	glScalef(0.025f,0.025f,0.025f);
+	glMatrixMode(GL_MODELVIEW);
+  	firsttime = false;
   	
+
 	glBindTexture(GL_TEXTURE_2D, g_textures[1]);
 	
 	if(noiseMapCreated){
@@ -255,8 +265,8 @@ void City::loadTexture(GLuint num, std::string name){
 void City::initTexture() {
 	
 	glGenTextures(2, g_textures); // Generate texture ID
-	loadTexture(g_textures[0], "stonewall");
-	loadTexture(g_textures[1], "stoneroad");
+	loadTexture(g_textures[1], "stonewall");
+	loadTexture(g_textures[0], "stoneroad");
 	
 
 	
