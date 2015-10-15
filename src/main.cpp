@@ -40,6 +40,8 @@ float g_zoomFactor = 10;
 //
 Geometry *g_geometry = nullptr;
 Lava *lava = nullptr;
+City *city = nullptr;
+Weather *weather = nullptr;
 
 vec3 lightPosition(-1.93849, 11.233, 21.9049);
 vec3 lightDirection(-26.4, 355.2,0);
@@ -91,8 +93,6 @@ GLhandleARB shadowShaderId;
 GLuint shadowMapUniform;
 
 bool useShadowMap = false;
-
-City *city = nullptr;
 
 //camerafields
 float xCam,yCam,zCam = 0;
@@ -352,6 +352,7 @@ void draw() {
 		city->render();
 		g_geometry->renderGeometry();
 		lava->renderLava();
+		weather->renderClouds();
 
 	}
 
@@ -537,6 +538,7 @@ int main(int argc, char **argv) {
 	// Finally create our geometry
 	city = new City();
 	g_geometry = new Geometry("Volcano/res/assets/volcano.obj");
+	weather = new Weather();
 
 	//Initate Lava
 	lava = new Lava(g_geometry);
@@ -549,5 +551,6 @@ int main(int argc, char **argv) {
 	// Don't forget to delete all pointers that we made
 	delete city;
 	delete g_geometry;
+	delete weather;
 	return 0;
 }
