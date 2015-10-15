@@ -432,9 +432,9 @@ void createMoreLava(int j){ //creates lava flow  -nonstop
 for (int i =0;i < 10 ;i++)				// Initials All The Textures
 	{
 		particle p;
-		p.x = 30;
+		p.x = 0;
 		p.y = 0;
-		p.z = 30;
+		p.z = 0;
 		p.alive=true;								// Make All The particless alive
 		p.life=50;								// Give All The particless Full Life
 		p.fade=0.05f;								// Random Fade Speed
@@ -500,7 +500,7 @@ int main(int argc, char **argv) {
 	g_geometry = new Geometry("../Volcano/res/assets/volcano.obj");
 
 	//Initate Lava
-	lava = new Lava();
+	lava = new Lava(g_geometry);
 	createMoreLava(1);
 
 	// Loop required by GLUT

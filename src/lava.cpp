@@ -10,9 +10,10 @@ using namespace std;
 using namespace comp308;
 
 vector<particle> particles;
+Geometry* geometry;
 
-
-Lava::Lava(){
+Lava::Lava(Geometry* geo){
+geometry = geo;
 particles.clear();
 initParticles();
 }
@@ -28,8 +29,13 @@ void Lava::initParticles()										// All Setup For OpenGL Goes Here
 
 
 void Lava::renderLava(){
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
+	// Enable flags for normal rendering
 	glEnable(GL_BLEND);
-	glDisable(GL_DEPTH_TEST);							// Disable Depth Testing
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_NORMALIZE);
+	glDisable(GL_LIGHTING);						// Disable Depth Testing
 
 	for (int i =0;i <particles.size();i++)					// Loop Through All The particless
 	{
@@ -43,7 +49,7 @@ void Lava::renderLava(){
 			//calculateNextMove(particles[i]);		//for city
 			particles[i].x+=particles[i].xi/(slowdown);// Move On The X Axis By X Speed
 			particles[i].z+=particles[i].zi/(slowdown);// Move On The Z Axis By Z Speed
-			particles[i].y=getHeight(particles[i].x,particles[i].z);// Move On The Y finding height on volcano
+			particles[i].y=getHeight(particles[i].x,particles[i].z)+1;// Move On The Y finding height on volcano
 
 			// Draw The particles Using Our RGB Values, Fade The particles Based On It's Life
 			glColor4f(particles[i].r,particles[i].g,particles[i].b,particles[i].life);
@@ -64,14 +70,15 @@ void Lava::renderLava(){
 		glPopMatrix();
     }
     glDisable(GL_BLEND);
-    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
 }
 
 float Lava::getHeight(float x, float z){
 	int intX = round(x);
 	int intZ = round(z);
-	//if(intX > 0 && intX<60 && intZ>0 && intZ< 60 )
-	//	return Geometry::getHeight(intX,intZ);
-	//else
+	if(intX > 0 && intX<60 && intZ>0 && intZ< 60 )
+		return geometry->getHeight(intX,intZ);
+	else
 		return 0;
 }

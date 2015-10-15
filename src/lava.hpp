@@ -31,7 +31,7 @@ class Lava{
 private:
 
 	comp308::vec3  lavaColor = comp308::vec3(1,0.4f,0);
-	float slowdown = 2000.0f;
+	float slowdown = 3000.0f;
 
 
 
@@ -40,7 +40,7 @@ private:
 public:
 	std::vector<particle> particles;
 
-	Lava();
+	Lava(Geometry*);
 	void initLava();
 	void renderLava();
 	void initParticles();
