@@ -9,19 +9,19 @@
 using namespace std;
 using namespace comp308;
 
-double windVelocity = 0.05;
-int windDir = -1;
+double windVelocity = 0.2;
+int windDir = 3;
 
 GLdouble particleRadius = 3;
 int cloudIndex = 0;
-Cloud clouds[10];
+Cloud clouds[50];
 
 float cloudHeight = 50;
 
-int cloudAmount = 5;
+int cloudAmount = 20;
 
 Weather::Weather(){
-	initialiseWind();
+	//initialiseWind();
 	initialiseCloud();
 }
 
@@ -33,8 +33,8 @@ void Weather::initialiseCloud(){
 }
 
 void Weather::createCloud(int index){
-	int randomX = (rand() % 50) - (rand() % 50);
-	int randomZ = (rand() % 50) - (rand() % 50);
+	int randomX = rand() % 100 - (rand() % 50);
+	int randomZ = rand() % 150 - (rand() % 50);
 
 	Cloud c;
 	c.cloudCentre = vec3(randomX,cloudHeight,randomZ);
@@ -219,8 +219,8 @@ void Weather::renderClouds(){
 	for(int i=0; i < cloudIndex; i++){
 		Cloud c = clouds[i];
 		//cout << "Cloud Centre" << c.cloudCentre << endl;
-		if(c.cloudCentre.x < -300 || c.cloudCentre.x > 300
-			|| c.cloudCentre.z < -300 || c.cloudCentre.z > 300){
+		if(c.cloudCentre.x < -300 || c.cloudCentre.x > 1000
+			|| c.cloudCentre.z < -300 || c.cloudCentre.z > 1000){
 			createCloud(i);
 			continue;
 		}
