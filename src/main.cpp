@@ -94,6 +94,9 @@ bool useShadowMap = false;
 
 City *city = nullptr;
 
+//camerafields
+float xCam,yCam,zCam = 0;
+
 
 // Sets up where and what the light is
 // Called once on start up
@@ -120,7 +123,7 @@ void setUpCamera() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	glTranslatef(0, 0, -50 * g_zoomFactor);
+	glTranslatef(xCam, yCam, -50 * g_zoomFactor + zCam);
 	glRotatef(g_xRotation, 1, 0, 0);
 	glRotatef(g_yRotation, 0, 1, 0);
 }
@@ -383,7 +386,25 @@ void reshape(int w, int h) {
 //
 void keyboardCallback(unsigned char key, int x, int y) {
 	cout << "Keyboard Callback :: key=" << key << ", x,y=(" << x << "," << y << ")" << endl;
-	// YOUR CODE GOES HERE
+	switch (key){
+
+	case 'w': // left mouse button
+	zCam += 2;
+		break;
+
+	case 'a': // scroll foward/up
+	xCam += 2;
+		break;
+
+	case 's': // left mouse button
+	zCam -= 2;
+		break;
+
+	case 'd': // scroll foward/up
+	xCam -= 2;
+		break;
+
+	}
 }
 
 
@@ -392,7 +413,19 @@ void keyboardCallback(unsigned char key, int x, int y) {
 //
 void specialCallback(int key, int x, int y) {
 	cout << "Special Callback :: key=" << key << ", x,y=(" << x << "," << y << ")" << endl;
-	// Not needed for this assignment, but useful to have later on
+	switch (key){
+
+	case 101: // left mouse button
+	yCam += 2;
+		break;
+
+	case 103: // scroll foward/up
+	yCam -= 2;
+		break;
+
+
+
+	}
 }
 
 
