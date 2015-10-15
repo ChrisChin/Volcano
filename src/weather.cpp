@@ -231,7 +231,7 @@ void Weather::renderClouds(){
 }
 
 void Weather::renderParticles(CloudParticle p){
-	glColor3f(1.0f,1.0f,1.0f);
+	glColor3f(0.5f,0.5f,0.5f);
 	glPushMatrix();
 	glTranslatef(p.particleCentre.x,p.particleCentre.y,p.particleCentre.z);
 	glutSolidSphere(particleRadius,20,20);
