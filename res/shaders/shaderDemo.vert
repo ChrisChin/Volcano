@@ -14,14 +14,18 @@
 
 #version 120
 
-// Values to pass to the fragment shader
-varying vec3 vNormal;
-varying vec3 vPosition;
-varying vec2 vTextureCoord0;
+// Used for shadow lookup
+varying vec4 ShadowCoord;
 
-void main() {
-	vNormal = normalize(gl_NormalMatrix * gl_Normal);
-	vPosition = vec3(gl_ModelViewMatrix * gl_Vertex);
-	vTextureCoord0 = gl_MultiTexCoord0.xy;
-	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+
+
+void main()
+{
+
+
+     	ShadowCoord= gl_TextureMatrix[7] * gl_Vertex;
+  
+		gl_Position = ftransform();
+
+		gl_FrontColor = gl_Color;
 }
