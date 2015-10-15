@@ -101,6 +101,7 @@ void draw() {
 	
 	city->render();
 
+	//cout << "Height at 10,10 "<< city->getCityHeight(10,10) << endl;
 
 	glColor3f(1.0f, 0.0f, 0.0f);
 	g_geometry->renderGeometry();

@@ -58,9 +58,9 @@ void City::render(){
 	glBindTexture(GL_TEXTURE_2D, g_textures[0]);
 
 
-	glMatrixMode(GL_TEXTURE);
-	glScalef(5.0f,5.0f,5.0f);
-	glMatrixMode(GL_MODELVIEW);
+	// glMatrixMode(GL_TEXTURE);
+	// glScalef(5.0f,5.0f,5.0f);
+	// glMatrixMode(GL_MODELVIEW);
 	//City Base
 	//glColor3f(1.0, 0.894, 0.769);
 	glBegin(GL_QUADS);
