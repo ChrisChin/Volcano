@@ -47,9 +47,9 @@ City *city = nullptr;
 // Called once on start up
 // 
 void initLight() {
-	float direction[] = { 0.0f, 0.0f, 1.0f, 0.0f };
+	float direction[] = { 0.0f, 0.0f, -1.0f, 0.0f };
 	float diffintensity[] = { 0.7f, 0.7f, 0.7f, 1.0f };
-	float ambient[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+	float ambient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 	glLightfv(GL_LIGHT0, GL_POSITION, direction);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffintensity);
@@ -179,7 +179,7 @@ void mouseCallback(int button, int state, int x, int y) {
 // at least one mouse button has an active state
 // 
 void mouseMotionCallback(int x, int y) {
-	cout << "Mouse Motion Callback :: x,y=(" << x << "," << y << ")" << endl;
+	//cout << "Mouse Motion Callback :: x,y=(" << x << "," << y << ")" << endl;
 	// YOUR CODE GOES HERE
 	// ...
 	if (g_mouseDown) {

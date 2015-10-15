@@ -24,6 +24,7 @@ bool noiseMapCreated = false;
 
 //Colour map
 comp308::vec3* colourMap[mapX][mapY];
+int textureMap[mapX][mapY];
 
 
 //building information
@@ -40,7 +41,7 @@ bool firsttime = true;
 
 //Texture info
 GLuint g_texture = 0;
-GLuint g_textures[2];
+GLuint g_textures[8];
 
 City::City(){
 	createNoiseMap();
@@ -87,15 +88,17 @@ void City::render(){
 	glMatrixMode(GL_MODELVIEW);
   	firsttime = false;
   	
-
-	glBindTexture(GL_TEXTURE_2D, g_textures[1]);
+ //  	int randTexture = rand() % 3 + 1;
+	// glBindTexture(GL_TEXTURE_2D, g_textures[randTexture]);
 	
 	if(noiseMapCreated){
 		for(int a=0; a<mapY; a++){
 			for(int b=0; b<mapX; b++){
 				if(noiseMap[a][b]!=(-1)){
 
-					glBindTexture(GL_TEXTURE_2D, g_textures[1]);
+					int randTexture = textureMap[a][b];
+					glBindTexture(GL_TEXTURE_2D, g_textures[randTexture]);
+					
 					//glColor3f(colourMap[a][b]->x, colourMap[a][b]->y, colourMap[a][b]->z);
 					//floor
 					glBegin(GL_QUADS);
@@ -186,6 +189,12 @@ void City::createNoiseMap(){
 			comp308::vec3* colour = new vec3(randR, randG, randB); 
 			colourMap[a][b] = colour;
 
+			//random textures
+			int randTexture = (rand() % 7) + 1;
+			textureMap[a][b] = randTexture;
+
+
+
 
 			//House colours
 			// comp308::vec3* sampleMap[2];
@@ -264,9 +273,16 @@ void City::loadTexture(GLuint num, std::string name){
 
 void City::initTexture() {
 	
-	glGenTextures(2, g_textures); // Generate texture ID
-	loadTexture(g_textures[1], "stonewall");
+	glGenTextures(8, g_textures); // Generate texture ID
 	loadTexture(g_textures[0], "stoneroad");
+	loadTexture(g_textures[1], "stonewall");
+	loadTexture(g_textures[2], "stonewall2");
+	loadTexture(g_textures[3], "stonewall3");
+	loadTexture(g_textures[4], "stonewall4");
+	loadTexture(g_textures[5], "stonewall5");
+	loadTexture(g_textures[6], "stonewall6");
+	loadTexture(g_textures[7], "stonewall7");
+	
 	
 
 	
