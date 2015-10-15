@@ -28,7 +28,7 @@ GLuint g_mainWindow = 0;
 // 
 float g_fovy = 20.0;
 float g_znear = 0.1;
-float g_zfar = 1000.0;
+float g_zfar = 100000.0;
 
 bool g_mouseDown = false;
 vec2 g_mousePos;
@@ -92,13 +92,16 @@ GLuint shadowMapUniform;
 
 bool useShadowMap = false;
 
+City *city = nullptr;
+
+
 // Sets up where and what the light is
 // Called once on start up
 // 
 void initLight() {
-	float direction[] = { 0.0f, 0.0f, 1.0f, 0.0f };
+	float direction[] = { 0.0f, 0.0f, -1.0f, 0.0f };
 	float diffintensity[] = { 0.7f, 0.7f, 0.7f, 1.0f };
-	float ambient[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+	float ambient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 	glLightfv(GL_LIGHT0, GL_POSITION, direction);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffintensity);
@@ -342,11 +345,13 @@ void draw() {
 		glUseProgram(0);
 	}
 	else{
+		glColor3f(0.5f, 0.5f, 0.5f);
+		city->render();
 		g_geometry->renderGeometry();
 		lava->renderLava();
+
 	}
 
-	
 	// Disable flags for cleanup (optional)
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_LIGHTING);
@@ -416,7 +421,7 @@ void mouseCallback(int button, int state, int x, int y) {
 // at least one mouse button has an active state
 // 
 void mouseMotionCallback(int x, int y) {
-	cout << "Mouse Motion Callback :: x,y=(" << x << "," << y << ")" << endl;
+	//cout << "Mouse Motion Callback :: x,y=(" << x << "," << y << ")" << endl;
 	// YOUR CODE GOES HERE
 	// ...
 	if (g_mouseDown) {
@@ -497,7 +502,8 @@ int main(int argc, char **argv) {
 	initShader();
 
 	// Finally create our geometry
-	g_geometry = new Geometry("../Volcano/res/assets/volcano.obj");
+	city = new City();
+	g_geometry = new Geomery("../Volcano/res/assets/volcano.obj");
 
 	//Initate Lava
 	lava = new Lava(g_geometry);
@@ -508,6 +514,7 @@ int main(int argc, char **argv) {
 	glutMainLoop();
 
 	// Don't forget to delete all pointers that we made
+	delete city;
 	delete g_geometry;
 	return 0;
 }
