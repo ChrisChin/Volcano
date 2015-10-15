@@ -15,12 +15,86 @@
 using namespace std;
 using namespace comp308;
 
+float minHeight;
+float maxHeight;
+float minX;
+float maxX;
+float minZ;
+float maxZ;
+
+float heightMap[60][60];
+
+GLfloat ambient[4] = { 0.2, 0.1, 0.0, 1.0 };
+GLfloat diffuse[3] = { 1.0, 1.0, 1.0};
+GLfloat specular[3] = { 0, 0, 0 };
+GLfloat shininess = 0.25;
+float Geometry::getHeight(int x, int z){
+	return heightMap[x + 30][z + 30];
+}
+
 Geometry::Geometry(string filename) {
 	m_filename = filename;
 	readOBJ(filename);
 	if (m_triangles.size() > 0) {
 		createDisplayListPoly();
 	}
+	float min = 10000;
+	float max = 0;
+	for (int i = 0; i < m_points.size(); i++){
+		if (m_points[i].y < min)
+			min = m_points[i].y;
+		if (m_points[i].y > max)
+			max = m_points[i].y;
+	}
+	maxHeight = max;
+	minHeight = min;
+	
+	cout << "maxheight " << maxHeight << endl;
+	cout << "minHeight " << minHeight << endl;
+
+	float currentminX = 10000;
+	float currentmaxX = 0;
+	for (int i = 0; i < m_points.size(); i++){
+		if (m_points[i].x < currentminX)
+			currentminX = m_points[i].x;
+		if (m_points[i].x > currentmaxX)
+			currentmaxX = m_points[i].x;
+	}
+	maxX = currentmaxX;
+	minX = currentminX;
+
+	cout << "maxX " << maxX << endl;
+	cout << "minX " << minX << endl;
+
+	float currentminZ = 10000;
+	float currentmaxZ = 0;
+	for (int i = 0; i < m_points.size(); i++){
+		if (m_points[i].z < currentminZ)
+			currentminZ = m_points[i].z;
+		if (m_points[i].z > currentmaxZ)
+			currentmaxZ = m_points[i].z;
+	}
+	maxX = currentmaxZ;
+	minX = currentminZ;
+
+	cout << "currentmaxZ " << currentmaxZ << endl;
+	cout << "currentminZ " << currentminZ << endl;
+	for (int i = 0; i < 60; i++){
+		for (int j = 0; j < 60; j++){
+			heightMap[i][j] = 0;
+		}
+	}
+
+	for (int i = 0; i < m_points.size(); i++){
+		heightMap[((int) m_points[i].x) +30][((int) m_points[i].z)+30] = m_points[i].y;
+	}
+
+	//for (int i = 0; i < 60; i++){
+	//	for (int j = 0; j < 60; j++){
+	//		cout << heightMap[i][j]<< endl;
+	//	}
+	//}
+
 }
 
 void Geometry::readOBJ(string filename) {
@@ -159,7 +233,13 @@ void Geometry::createDisplayListPoly() {
 	// Create a new list
 	cout << "Creating Poly Geometry" << endl;
 	m_displayListPoly = glGenLists(1);
-	glNewList(m_displayListPoly, GL_COMPILE);
+	glNewList(m_displayListPoly, GL_COMPILE); 
+	//glColor3f(0.2, 0.1, 0);
+
+	glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+	glMaterialf(GL_FRONT, GL_SHININESS, shininess*128.0);
 
 	glBegin(GL_TRIANGLES);
 	for (unsigned int i = 0; i < m_triangles.size(); i++){

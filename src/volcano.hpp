@@ -42,4 +42,5 @@ public:
 
 	void renderGeometry();
 	float angle;
+	float getHeight(int x,int z);
 };
