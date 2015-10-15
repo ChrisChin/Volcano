@@ -19,8 +19,8 @@ using namespace comp308;
 
 // Global variables
 // 
-GLuint g_winWidth = 640;
-GLuint g_winHeight = 480;
+GLuint g_winWidth = 1280;
+GLuint g_winHeight = 720;
 GLuint g_mainWindow = 0;
 
 
@@ -273,7 +273,7 @@ void drawObjects(void)
 }
 
 void initShader() {
-	g_shader = makeShaderProgram("../Volcano/res/shaders/shaderDemo.vert", "../Volcano/res/shaders/shaderDemo.frag");
+	g_shader = makeShaderProgram("Volcano/res/shaders/shaderDemo.vert", "Volcano/res/shaders/shaderDemo.frag");
 }
 
 void draw() {
@@ -438,7 +438,7 @@ for (int i =0;i < 10 ;i++)				// Initials All The Textures
 	{
 		particle p;
 		p.x = 0;
-		p.y = 0;
+		p.y = 10;
 		p.z = 0;
 		p.alive=true;								// Make All The particless alive
 		p.life=50;								// Give All The particless Full Life
@@ -472,7 +472,7 @@ int main(int argc, char **argv) {
 
 	// Initialise window size and create window
 	glutInitWindowSize(g_winWidth, g_winHeight);
-	g_mainWindow = glutCreateWindow("COMP308 Assignment 1");
+	g_mainWindow = glutCreateWindow("COMP308 Final Project");
 
 
 	// Initilise GLEW
@@ -503,7 +503,7 @@ int main(int argc, char **argv) {
 
 	// Finally create our geometry
 	city = new City();
-	g_geometry = new Geomery("../Volcano/res/assets/volcano.obj");
+	g_geometry = new Geometry("Volcano/res/assets/volcano.obj");
 
 	//Initate Lava
 	lava = new Lava(g_geometry);

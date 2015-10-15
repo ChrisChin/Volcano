@@ -47,9 +47,9 @@ void Lava::renderLava(){
 			float z=particles[i].z;					// particles Z Pos + Zoom
 
 			//calculateNextMove(particles[i]);		//for city
-			particles[i].x+=particles[i].xi/(slowdown);// Move On The X Axis By X Speed
-			particles[i].z+=particles[i].zi/(slowdown);// Move On The Z Axis By Z Speed
-			particles[i].y=getHeight(particles[i].x,particles[i].z)+1;// Move On The Y finding height on volcano
+			particles[i].x+=(particles[i].xi/(slowdown) + 0.02);// Move On The X Axis By X Speed
+			particles[i].z+=(particles[i].zi/(slowdown)  + 0.02);// Move On The Z Axis By Z Speed
+			particles[i].y=getHeight(particles[i].x,particles[i].z);// Move On The Y finding height on volcano
 
 			// Draw The particles Using Our RGB Values, Fade The particles Based On It's Life
 			glColor4f(particles[i].r,particles[i].g,particles[i].b,particles[i].life);
@@ -78,7 +78,7 @@ float Lava::getHeight(float x, float z){
 	int intX = round(x);
 	int intZ = round(z);
 	if(intX > 0 && intX<60 && intZ>0 && intZ< 60 )
-		return geometry->getHeight(intX,intZ);
+		return (geometry->getHeight(intX,intZ)+3);
 	else
 		return 0;
 }

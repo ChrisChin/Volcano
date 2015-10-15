@@ -17,8 +17,8 @@ using namespace comp308;
 
 
 //NoiseMap
-const int mapX = 100;
-const int mapY = 100;
+const int mapX = 75;
+const int mapY = 75;
 int noiseMap[mapX][mapY];
 bool noiseMapCreated = false;
 
