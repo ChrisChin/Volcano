@@ -27,11 +27,12 @@ private:
 	void initialiseCloud();
 	void createCloud(int index);
 	void transitionCloud();
-	void initialiseWind();
 	void growClouds();
 	void cloudExtinction();
 	void renderParticles(CloudParticle p);
 public:
+	int windDir = 3;
+	double windVelocity = 0.2;
 	Weather();
 	void renderClouds();
 };

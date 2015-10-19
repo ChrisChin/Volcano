@@ -9,9 +9,6 @@
 using namespace std;
 using namespace comp308;
 
-double windVelocity = 0.2;
-int windDir = 3;
-
 GLdouble particleRadius = 3;
 int cloudIndex = 0;
 Cloud clouds[50];
@@ -21,7 +18,6 @@ float cloudHeight = 50;
 int cloudAmount = 20;
 
 Weather::Weather(){
-	//initialiseWind();
 	initialiseCloud();
 }
 
@@ -112,10 +108,6 @@ void Weather::transitionCloud(){
 			}
 		}	
 	}
-}
-
-void Weather::initialiseWind(){
-	windDir = rand() % 8;
 }
 
 void Weather::growClouds(){
