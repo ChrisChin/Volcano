@@ -25,13 +25,15 @@ bool noiseMapCreated = false;
 //Colour map
 comp308::vec3* colourMap[mapX][mapY];
 int textureMap[mapX][mapY];
-
+int doorMap[mapX][mapY];
 
 //building information
 int Hlength = 3;
 int Hheight = 2;
-int Hrange = 3;
+int Hrange = 4;
 
+int DLength = 1;
+int DHeight = 1;
 //Road info
 int Roadgap = mapX/5;
 
@@ -96,6 +98,8 @@ void City::render(){
 			for(int b=0; b<mapX; b++){
 				if(noiseMap[a][b]!=(-1)){
 
+
+
 					int randTexture = textureMap[a][b];
 					glBindTexture(GL_TEXTURE_2D, g_textures[randTexture]);
 					
@@ -120,6 +124,8 @@ void City::render(){
   					glVertex3f(b*Hlength, noiseMap[a][b], (a*Hlength)+Hlength);
   					glTexCoord2f(1.0f, 0.0f);
   					glVertex3f(b*Hlength, 0.0, (a*Hlength)+Hlength);
+
+  					
 
   					//back
   					glTexCoord2f(0.0f, 0.0f);
@@ -160,6 +166,11 @@ void City::render(){
   					glVertex3f((b*Hlength)+Hlength, noiseMap[a][b], (a*Hlength)+Hlength);
   					glTexCoord2f(1.0f, 0.0f);
   					glVertex3f(b*Hlength, noiseMap[a][b], (a*Hlength)+Hlength);
+
+
+  					glBindTexture(GL_TEXTURE_2D, g_textures[0]);
+  					//glColor3f(1.0f,1.0f,1.0f);
+
   					glEnd();
   					glFlush(); 
 
@@ -174,35 +185,29 @@ void City::render(){
 	glDisable(GL_TEXTURE_2D);
 }
 
+// void City::adjustNoiseMap(){
+// 	for(int a=0; a<mapY; a++){
+// 		for(int b=0; b<mapX; b++){
+// 			if(noiseMap[a][b])
+
+
+// 		}
+// 	}
+
+// }
+
 void City::createNoiseMap(){
 	for(int a=0; a<mapY; a++){
 		for(int b=0; b<mapX; b++){
 
-			//setting colours
-			float randR = rand() % 100;
-			float randG = rand() % 100;
-			float randB = rand() % 100;
-			randR = randR/100;
-			randG = randG/100;
-			randB = randB/100;
-
-			comp308::vec3* colour = new vec3(randR, randG, randB); 
-			colourMap[a][b] = colour;
 
 			//random textures
 			int randTexture = (rand() % 7) + 1;
 			textureMap[a][b] = randTexture;
 
-
-
-
-			//House colours
-			// comp308::vec3* sampleMap[2];
-			// comp308::vec3* sienna = new vec3(0.627, 0.322, 0.176); 
-			// comp308::vec3* grey = new vec3(0.663, 0.663, 0.663); 
-			// sampleMap[0] = sienna;
-			// sampleMap[1] = grey;
-			// int random = rand() % 2;
+			//setting door sides
+			int doorside = (rand() % 4) + 1;
+			doorMap[a][b] = doorside;
 			
 
 			// colourMap[a][b] = sampleMap[random];
@@ -237,6 +242,7 @@ void City::createNoiseMap(){
 	}
 
 	noiseMapCreated = true;
+	//adjustNoiseMap();
 
 
 

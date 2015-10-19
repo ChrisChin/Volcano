@@ -108,13 +108,25 @@ void displayInfo(float x,float y, string str);
 void initLight() {
 	float direction[] = { 0.0f, 0.0f, -1.0f, 0.0f };
 	float diffintensity[] = { 0.7f, 0.7f, 0.7f, 1.0f };
-	float ambient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	float ambient[] = { 0.1f, 0.1f, 0.1f, 1.0f };
 
 	glLightfv(GL_LIGHT0, GL_POSITION, direction);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffintensity);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
 
+	GLfloat pointPosition[] ={0.0f, 30.0f, 0.0f,1.0f};	
+	float pointDiff[] = {1.0f, 0.0f, 0.0f, 1.0f};
+	float pointSpec[] = {1.0f, 0.0f, 0.0f, 1.0f};
+	float pointAmb[] = {0.2f, 0.0f, 0.0f, 1.0f};
+	glLightfv(GL_LIGHT1, GL_POSITION, pointPosition);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE,  pointDiff);
+	glLightfv(GL_LIGHT1, GL_SPECULAR,  pointSpec);
+	glLightfv(GL_LIGHT1, GL_AMBIENT,  pointAmb);
+	
+
+
 	glEnable(GL_LIGHT0);
+	glEnable(GL_LIGHT1);
 }
 
 void setUpCamera() {
