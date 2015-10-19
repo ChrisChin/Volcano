@@ -97,6 +97,10 @@ bool useShadowMap = false;
 //camerafields
 float xCam,yCam,zCam = 0;
 
+void Simulation_menu(int id);
+void wind_velocity(int id);
+void wind_dir_menu(int id);
+void displayInfo(float x,float y, string str);
 
 // Sets up where and what the light is
 // Called once on start up
@@ -353,7 +357,6 @@ void draw() {
 		g_geometry->renderGeometry();
 		lava->renderLava();
 		weather->renderClouds();
-
 	}
 
 	// Disable flags for cleanup (optional)
@@ -491,6 +494,48 @@ for (int i =0;i < 10 ;i++)				// Initials All The Textures
 
 	glutTimerFunc(100,createMoreLava,1); 					//flow at 100 milliseconds
 }
+void wind_dir_menu(int id){
+	switch(id){
+		case 1:
+			weather->windDir = 0;
+			break;
+		case 2:
+			weather->windDir = 1;
+			break;
+		case 3:
+			weather->windDir = 2;
+			break;
+		case 4:
+			weather->windDir = 3;
+			break;
+		case 5:
+			weather->windDir = 4;
+			break;
+		case 6:
+			weather->windDir = 5;
+			break;
+		case 7:
+			weather->windDir = 6;
+			break;
+		case 8:
+			weather->windDir = 7;
+			break;
+	}
+}
+
+void wind_velocity(int id){
+		switch(id){
+		case 9:
+			weather->windVelocity += 0.1;
+			break;
+		case 10:
+			weather->windVelocity -= 0.1;
+			break;
+	}
+}
+
+void Simulation_menu(int id){
+}
 
 //Main program
 // 
@@ -508,6 +553,23 @@ int main(int argc, char **argv) {
 	glutInitWindowSize(g_winWidth, g_winHeight);
 	g_mainWindow = glutCreateWindow("COMP308 Final Project");
 
+	GLint wind_dir = glutCreateMenu(wind_dir_menu); 
+	glutAddMenuEntry("North",1);
+	glutAddMenuEntry("North East",2);
+	glutAddMenuEntry("East",3);
+	glutAddMenuEntry("South East",4);
+	glutAddMenuEntry("South",5);
+	glutAddMenuEntry("South West",6);
+	glutAddMenuEntry("West",7);
+	glutAddMenuEntry("North West",8);
+	GLint wind_vel = glutCreateMenu(wind_velocity);
+	glutAddMenuEntry("Increase",9);
+	glutAddMenuEntry("Descrease",10);
+
+	glutCreateMenu(Simulation_menu);
+	glutAddSubMenu("Wind Direction",wind_dir);
+	glutAddSubMenu("Wind Velocity",wind_vel);
+	glutAttachMenu(GLUT_RIGHT_BUTTON);
 
 	// Initilise GLEW
 	// must be done after creating GL context (glutCreateWindow in this case)
